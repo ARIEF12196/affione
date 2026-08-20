@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+  body { background-color: #f4f7f6; margin: 0; padding: 10px; }
+  
+  .form-container, .affiliate-container {
+    background: #ffffff;
+    border: 2px solid #0056b3;
+    border-radius: 12px;
+    padding: 25px;
+    max-width: 500px;
+    margin: 10px auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+  
+  .product-header {
+    text-align: center;
+    background-color: #eef5ff;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px dashed #0056b3;
+  }
+  .product-header h2 { margin: 0; color: #0056b3; font-size: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .product-header p { margin: 4px 0 0; color: #28a745; font-weight: bold; font-size: 14px; }
+  
+  .form-group { margin-bottom: 14px; text-align: left; }
+  .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: #333; font-size: 13px; }
+  .form-group input, .form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    border-color: #0056b3;
+    box-shadow: 0 0 5px rgba(0, 86, 179, 0.3);
+  }
+
+  /* TOMBOL UTAMA */
+  .btn-next, .btn-submit, .btn-custom {
+    width: 100%;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s ease;
+  }
+  .btn-next:hover, .btn-custom:hover { background-color: #004085; }
+  .btn-submit { background-color: #28a745; }
+  .btn-submit:hover { background-color: #218838; }
+
+  .aff-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    font-size: 13px;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    overflow-y: auto;
+  }
+  
+  .modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 26px; font-weight: bold;
+    color: #888; cursor: pointer;
+  }
+  .close-btn:hover { color: #000; }
+
+  .payment-instruction {
+    background-color: #fdfefe;
+    border: 2px dashed #28a745;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+  }
+  .payment-instruction h4 { margin: 0 0 6px; color: #333; font-size: 16px; font-weight: bold; }
+  .payment-instruction p { margin: 0 0 8px; color: #555; font-size: 13px; line-height: 1.4; }
+  .payment-instruction .nominal { margin: 10px 0 6px; font-weight: bold; color: #0056b3; font-size: 17px; }
+
+  .qris-frame-container {
+    width: 100%; max-width: 360px; height: 380px;
+    margin: 10px auto; border-radius: 8px; overflow: hidden;
+    border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .qris-frame-container iframe { width: 100%; height: 100%; border: none; }
+
+  .timer-box {
+    margin-top: 12px; background-color: #fff3cd; border: 1px solid #ffeba2;
+    border-radius: 6px; padding: 8px; color: #856404; font-weight: bold; font-size: 13px;
+  }
+  .timer-box #countdown { color: #dc3545; font-size: 17px; font-family: monospace; display: block; margin-top: 2px; }
+
+  .tab-nav { display: flex; justify-content: space-around; margin-bottom: 15px; background: #e9ecef; padding: 5px; border-radius: 6px; }
+  .tab-nav button { background: none; border: none; padding: 8px 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 12px; }
+  .tab-nav button.active { background: #0056b3; color: white; }
+
+  /* Tombol Akses Admin Rahasia di bawah halaman */
+  .admin-trigger {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 11px;
+  }
+  .admin-trigger a { color: #adb5bd; text-decoration: none; }
+  .admin-trigger a:hover { color: #495057; }
+</style>
+</head>
+<body>
+
+<div class="form-container">
+  <!-- DASHBOARD / INFO USER DI POJOK KANAN ATAS -->
+  <div class="aff-top-bar" id="userTopBar">
+    <div>👤 <b>Tamu</b></div>
+    <div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>
+  </div>
+
+  <!-- Header Produk -->
+  <div class="product-header">
+    <h2>Aplikasi Kasir Diffaza</h2>
+    <p>Harga Promo: Rp 55.000</p>
+  </div>
+  
+  <form id="orderForm" onsubmit="openOverlay(event)">
+    <div class="form-group">
+      <label>Nama Owner</label>
+      <input type="text" id="namaOwner" placeholder="Masukkan nama pemilik usaha" required>
+    </div>
+
+    <div class="form-group">
+      <label>Nama Toko / Usaha</label>
+      <input type="text" id="namaToko" placeholder="Masukkan nama toko Anda" required>
+    </div>
+
+    <div class="form-group">
+      <label>No. WA / HP</label>
+      <input type="tel" id="whatsapp" placeholder="Contoh: 08123456789" required>
+    </div>
+
+    <div class="form-group">
+      <label>Email Pribadi</label>
+      <input type="email" id="email" placeholder="contoh@gmail.com" required>
+    </div>
+
+    <div class="form-group">
+      <label>Alamat Bisnis</label>
+      <textarea id="alamatBisnis" rows="3" placeholder="Masukkan alamat lengkap usaha/bisnis" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Kode Referal (No. Dana Affiliate)</label>
+      <input type="text" id="kodeReferalInput" placeholder="Otomatis terisi jika dari link affiliate" readonly style="background-color: #e9ecef;">
+    </div>
+
+    <button type="submit" class="btn-next">💳 LANJUT KE PEMBAYARAN QRIS</button>
+  </form>
+</div>
+
+<!-- LINK MASUK ADMIN RAHASIA -->
+<div class="admin-trigger">
+  <a href="#" onclick="openAdminLogin(event)">🔒 Panel Khusus Admin Server</a>
+</div>
+
+<!-- POP-UP OVERLAY PEMBAYARAN -->
+<div id="paymentModal" class="modal-overlay">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeOverlay()">&times;</span>
+    <div class="payment-instruction">
+      <h4>Scan QRIS Untuk Membayar</h4>
+      <p>Scan QRIS di bawah ini menggunakan GoPay, OVO, DANA, ShopeePay, atau m-Banking:</p>
+      <div class="qris-frame-container">
+        <iframe src="https://drive.google.com/file/d/1FsUAb-d5BtpLwe4N-MkkhMyN7RzE5I2P/preview"></iframe>
+      </div>
+      <p class="nominal">Total: Rp 55.000</p>
+      <div class="timer-box">
+        ⏱️ Sisa Waktu Pembayaran:
+        <span id="countdown">23:59:59</span>
+      </div>
+    </div>
+    <button type="button" class="btn-submit" onclick="sendOrderWA()">Screenshot QRIS & ✅ KIRIM BUKTI TRANSFER</button>
+  </div>
+</div>
+
+<!-- POP-UP MODAL AUTH & DASHBOARD AFFILIATE -->
+<div id="authModal" class="modal-overlay">
+  <div class="modal-content" style="text-align: left;">
+    <span class="close-btn" onclick="closeAuthModal()">&times;</span>
+    
+    <div id="authContainer">
+      <div class="tab-nav">
+        <button id="tabLoginBtn" class="active" onclick="switchTab('login')">LOGIN AFFILIATE</button>
+        <button id="tabRegBtn" onclick="switchTab('register')">DAFTAR BARU</button>
+      </div>
+
+      <div id="formLoginSection">
+        <h3 style="color:#0056b3; margin-top:0;">Login Affiliate</h3>
+        <div class="form-group">
+          <label>No. HP / No. DANA</label>
+          <input type="tel" id="loginNoHp" placeholder="Masukkan No DANA terdaftar">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="Password akun">
+        </div>
+        <button type="button" class="btn-custom" onclick="processLogin()">Masuk Dashboard</button>
+      </div>
+
+      <div id="formRegSection" style="display: none;">
+        <h3 style="color:#0056b3; margin-top:0;">Pendaftaran Affiliate Baru</h3>
+        <div class="form-group">
+          <label>Nama Lengkap (Nama Affiliate)</label>
+          <input type="text" id="regNama" placeholder="Nama Anda">
+        </div>
+        <div class="form-group">
+          <label>No. HP / WhatsApp</label>
+          <input type="tel" id="regNoHp" placeholder="08xxxxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label>No. Akun DANA (Akan jadi Kode Referal)</label>
+          <input type="tel" id="regNoDana" placeholder="Nomor DANA untuk pencairan komisi">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="regPassword" placeholder="Buat password">
+        </div>
+        <button type="button" class="btn-submit" onclick="processRegister()">Daftar Sekarang</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD AFFILIATE -->
+    <div id="dashboardSection" style="display: none;">
+      <h3 style="color:#0056b3; margin-top:0;">Dashboard Affiliate</h3>
+      <div style="background: #eef5ff; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+        <p style="margin:0 0 5px;">👤 Halo, <b id="dashNama"></b></p>
+        <p style="margin:0 0 5px;">📱 No. DANA: <b id="dashDana"></b></p>
+        <p style="margin:0;">🔗 Link Referral Anda:</p>
+        <input type="text" id="dashLinkRef" readonly style="background: #fff; margin-top: 5px; font-size: 11px;">
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <div style="flex: 1; background: #fff3cd; padding: 10px; border-radius: 6px; text-align: center;">
+          <small>Sisa Komisi</small>
+          <div id="dashKomisi" style="font-weight: bold; color: #856404; font-size: 16px;">Rp 0</div>
+        </div>
+        <div style="flex: 1; background: #d4edda; padding: 10px; border-radius: 6px; text-align: center;">
+          <small>Total Lead / Klik</small>
+          <div id="dashLead" style="font-weight: bold; color: #155724; font-size: 16px;">0 Orang</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Unggah / Tulis Keterangan Bukti Komisi (Opsional)</label>
+        <input type="text" id="buktiPenarikan" placeholder="Cth: ID Transaksi / Screenshot terlampir">
+      </div>
+
+      <button type="button" class="btn-submit" onclick="tarikKomisi()" style="margin-bottom: 8px;">💸 TARIK KOMISI & KIRIM BUKTI KE ADMIN</button>
+      <button type="button" class="btn-custom" onclick="processLogout()" style="background-color: #dc3545;">Keluar (Logout)</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL PANEL ADMIN (SERVER LOKAL / DATABASE SIMULASI) -->
+<div id="adminModal" class="modal-overlay">
+  <div class="modal-content" style="max-width: 600px; text-align: left; max-height: 90vh; overflow-y: auto;">
+    <span class="close-btn" onclick="closeAdminModal()">&times;</span>
+    <h3 style="color: #0056b3; margin-top: 0;">🔒 Server Dashboard Admin</h3>
+    
+    <div id="adminLoginForm">
+      <p style="font-size: 13px; color: #666;">Masukkan password khusus admin:</p>
+      <div class="form-group">
+        <input type="password" id="adminPasswordInput" placeholder="Password Admin">
+      </div>
+      <button type="button" class="btn-custom" onclick="verifyAdminLogin()">Buka Data Server</button>
+    </div>
+
+    <div id="adminDataDashboard" style="display: none;">
+      <h4 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #333;">📋 Database Daftar Affiliate</h4>
+      <div id="listAffiliateServer" style="font-size: 12px; margin-bottom: 20px; max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
+        <!-- Data Afiliasi Masuk Disini -->
+      </div>
+
+      <h4 style="border-bottom: 2px solid #28a745; padding-bottom: 5px; color: #333;">💸 Riwayat & Bukti Permintaan Tarik Komisi</h4>
+      <div id="listPenarikanServer" style="font-size: 12px; margin-bottom: 15px; max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
+        <!-- Data Penarikan Masuk Disini -->
+      </div>
+
+      <button type="button" class="btn-custom" onclick="lockAdmin()" style="background-color: #6c757d;">Kunci Kembali Admin</button>
+    </div>
+  </div>
+</div>
+
+<script>
+window.onload = function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get('ref');
+  if (refCode) {
+    document.getElementById('kodeReferalInput').value = refCode;
+    let leads = JSON.parse(localStorage.getItem('aff_leads_' + refCode)) || 0;
+    localStorage.setItem('aff_leads_' + refCode, leads + 1);
+  }
+  checkLoginStatus();
+  startTimer();
+};
+
+var timerInterval;
+function startTimer() {
+  var totalSeconds = localStorage.getItem("diffaza_timer");
+  if (!totalSeconds) { totalSeconds = 24 * 60 * 60; }
+
+  function updateTimerDisplay() {
+    if (totalSeconds <= 0) {
+      document.getElementById("countdown").innerHTML = "WAKTU HABIS";
+      localStorage.removeItem("diffaza_timer");
+      clearInterval(timerInterval);
+      return;
+    }
+    totalSeconds--;
+    localStorage.setItem("diffaza_timer", totalSeconds);
+
+    var hours = Math.floor(totalSeconds / 3600);
+    var minutes = Math.floor((totalSeconds % 3600) / 60);
+    var seconds = totalSeconds % 60;
+
+    document.getElementById("countdown").innerHTML = 
+      (hours < 10 ? "0" + hours : hours) + ":" + 
+      (minutes < 10 ? "0" + minutes : minutes) + ":" + 
+      (seconds < 10 ? "0" + seconds : seconds);
+  }
+  updateTimerDisplay();
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimerDisplay, 1000);
+}
+
+function openOverlay(event) {
+  event.preventDefault();
+  document.getElementById("paymentModal").style.display = "flex";
+}
+function closeOverlay() {
+  document.getElementById("paymentModal").style.display = "none";
+}
+
+function generateInvoice() {
+  var date = new Date();
+  var dateStr = date.getFullYear().toString() +
+                ("0" + (date.getMonth() + 1)).slice(-2) +
+                ("0" + date.getDate()).slice(-2);
+  var randomNum = Math.floor(1000 + Math.random() * 9000);
+  return "DFZ-" + dateStr + "-" + randomNum;
+}
+
+function sendOrderWA() {
+  var adminWA = "62859109851554";
+  var namaAplikasi = "Aplikasi Kasir Diffaza";
+  var noInvoice = generateInvoice();
+  
+  var namaOwner = document.getElementById("namaOwner").value;
+  var namaToko = document.getElementById("namaToko").value;
+  var wa = document.getElementById("whatsapp").value;
+  var email = document.getElementById("email").value;
+  var alamatBisnis = document.getElementById("alamatBisnis").value;
+  var kodeRef = document.getElementById("kodeReferalInput").value || "-";
+
+  var message = "🧾 *INVOICE PEMESANAN: " + noInvoice + "*%0A" +
+                "=============================%0A" +
+                "📦 *Produk:* " + namaAplikasi + "%0A" +
+                "💰 *Nominal:* Rp 55.000 (Via QRIS)%0A" +
+                "🤝 *Kode Referal (DANA):* " + kodeRef + "%0A" +
+                "⏱️ *Batas Waktu:* 24 Jam%0A%0A" +
+                "*DATA PEMESAN:*%0A" +
+                "• Nama Owner: " + namaOwner + "%0A" +
+                "• Nama Toko: " + namaToko + "%0A" +
+                "• No. WA/HP: " + wa + "%0A" +
+                "• Email Pribadi: " + email + "%0A" +
+                "• Alamat Bisnis: " + alamatBisnis + "%0A%0A" +
+                "Halo Admin, saya telah melakukan pemesanan via QRIS.";
+
+  var waUrl = "https://wa.me/" + adminWA + "?text=" + message;
+  window.open(waUrl, '_blank');
+}
+
+// AUTH AFFILIATE
+function openAuthModal() { document.getElementById("authModal").style.display = "flex"; }
+function closeAuthModal() { document.getElementById("authModal").style.display = "none"; }
+
+function switchTab(type) {
+  if(type === 'login') {
+    document.getElementById("formLoginSection").style.display = "block";
+    document.getElementById("formRegSection").style.display = "none";
+    document.getElementById("tabLoginBtn").classList.add("active");
+    document.getElementById("tabRegBtn").classList.remove("active");
+  } else {
+    document.getElementById("formLoginSection").style.display = "none";
+    document.getElementById("formRegSection").style.display = "block";
+    document.getElementById("tabRegBtn").classList.add("active");
+    document.getElementById("tabLoginBtn").classList.remove("active");
+  }
+}
+
+function processRegister() {
+  var nama = document.getElementById("regNama").value;
+  var noHp = document.getElementById("regNoHp").value;
+  var noDana = document.getElementById("regNoDana").value;
+  var pass = document.getElementById("regPassword").value;
+
+  if(!nama || !noHp || !noDana || !pass) {
+    alert("Semua kolom pendaftaran wajib diisi!");
+    return;
+  }
+
+  let users = JSON.parse(localStorage.getItem('aff_users')) || [];
+  if(users.some(u => u.noDana === noDana)) {
+    alert("Nomor DANA / Referal sudah terdaftar!");
+    return;
+  }
+
+  let newUser = { nama, noHp, noDana, pass, komisi: 15000, tanggal: new Date().toLocaleString() };
+  users.push(newUser);
+  localStorage.setItem('aff_users', JSON.stringify(users));
+
+  alert("Pendaftaran Berhasil! Silakan Login.");
+  switchTab('login');
+}
+
+function processLogin() {
+  var noDana = document.getElementById("loginNoHp").value;
+  var pass = document.getElementById("loginPassword").value;
+
+  let users = JSON.parse(localStorage.getItem('aff_users')) || [];
+  let foundUser = users.find(u => u.noDana === noDana && u.pass === pass);
+
+  if(foundUser) {
+    localStorage.setItem('aff_logged_in', JSON.stringify(foundUser));
+    alert("Login Berhasil!");
+    closeAuthModal();
+    checkLoginStatus();
+  } else {
+    alert("No DANA atau Password salah!");
+  }
+}
+
+function processLogout() {
+  localStorage.removeItem('aff_logged_in');
+  checkLoginStatus();
+  alert("Anda telah keluar.");
+}
+
+function checkLoginStatus() {
+  let loggedUser = JSON.parse(localStorage.getItem('aff_logged_in'));
+  let topBar = document.getElementById("userTopBar");
+  let authContainer = document.getElementById("authContainer");
+  let dashboardSection = document.getElementById("dashboardSection");
+
+  if(loggedUser) {
+    topBar.innerHTML = `<div>👤 <b>${loggedUser.nama}</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Dashboard</a></div>`;
+    authContainer.style.display = "none";
+    dashboardSection.style.display = "block";
+
+    document.getElementById("dashNama").innerText = loggedUser.nama;
+    document.getElementById("dashDana").innerText = loggedUser.noDana;
+    document.getElementById("dashKomisi").innerText = "Rp " + (loggedUser.komisi || 0).toLocaleString('id-ID');
+    
+    let leads = JSON.parse(localStorage.getItem('aff_leads_' + loggedUser.noDana)) || 0;
+    document.getElementById("dashLead").innerText = leads + " Orang";
+
+    let currentUrl = window.location.href.split('?')[0];
+    document.getElementById("dashLinkRef").value = currentUrl + "?ref=" + loggedUser.noDana;
+  } else {
+    topBar.innerHTML = `<div>👤 <b>Tamu</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>`;
+    authContainer.style.display = "block";
+    dashboardSection.style.display = "none";
+  }
+}
+
+function tarikKomisi() {
+  let loggedUser = JSON.parse(localStorage.getItem('aff_logged_in'));
+  if(!loggedUser || loggedUser.komisi <= 0) {
+    alert("Sisa komisi Anda masih kosong atau belum mencukupi.");
+    return;
+  }
+
+  let jumlahTarik = loggedUser.komisi;
+  let buktiInfo = document.getElementById("buktiPenarikan").value || "Tanpa Keterangan Tambahan";
+
+  // Simpan data penarikan ke database lokal server admin
+  let historyWithdraw = JSON.parse(localStorage.getItem('aff_withdraws')) || [];
+  let withdrawData = {
+    nama: loggedUser.nama,
+    noDana: loggedUser.noDana,
+    nominal: jumlahTarik,
+    bukti: buktiInfo,
+    waktu: new Date().toLocaleString()
+  };
+  historyWithdraw.push(withdrawData);
+  localStorage.setItem('aff_withdraws', JSON.stringify(historyWithdraw));
+
+  // Kirim otomatis data penarikan dan bukti ke WhatsApp Admin (0859109851554)
+  let adminWA = "62859109851554";
+  let waMessage = "💸 *PERMINTAAN TARIK KOMISI AFFILIATE*%0A" +
+                  "=============================%0A" +
+                  "• Nama: " + loggedUser.nama + "%0A" +
+                  "• No. DANA: " + loggedUser.noDana + "%0A" +
+                  "• Jumlah Tarik: Rp " + jumlahTarik.toLocaleString('id-ID') + "%0A" +
+                  "• Bukti/Keterangan: " + buktiInfo + "%0A" +
+                  "• Waktu: " + withdrawData.waktu + "%0A%0A" +
+                  "Halo Admin, saya telah mengajukan penarikan komisi. Mohon segera diproses ke rekening DANA saya. Terima kasih!";
+
+  let waUrl = "https://wa.me/" + adminWA + "?text=" + waMessage;
+  window.open(waUrl, '_blank');
+
+  alert("Permintaan penarikan komisi berhasil diproses! Saldo anda akan sampai ke rekening DANA (" + loggedUser.noDana + ") < 24 jam.");
+  
+  // Reset komisi user
+  loggedUser.komisi = 0;
+  localStorage.setItem('aff_logged_in', JSON.stringify(loggedUser));
+
+  let users = JSON.parse(localStorage.getItem('aff_users')) || [];
+  users = users.map(u => {
+    if(u.noDana === loggedUser.noDana) u.komisi = 0;
+    return u;
+  });
+  localStorage.setItem('aff_users', JSON.stringify(users));
+  checkLoginStatus();
+}
+
+// --- PANEL ADMIN RAHASIA ---
+function openAdminLogin(event) {
+  event.preventDefault();
+  document.getElementById("adminModal").style.display = "flex";
+}
+function closeAdminModal() {
+  document.getElementById("adminModal").style.display = "none";
+}
+
+function verifyAdminLogin() {
+  let pass = document.getElementById("adminPasswordInput").value;
+  // Ganti password admin di sini sesuai keinginan Anda (contoh: "admin123")
+  if(pass === "admin123") {
+    document.getElementById("adminLoginForm").style.display = "none";
+    document.getElementById("adminDataDashboard").style.display = "block";
+    loadAdminServerData();
+  } else {
+    alert("Password Admin Salah!");
+  }
+}
+
+function lockAdmin() {
+  document.getElementById("adminPasswordInput").value = "";
+  document.getElementById("adminLoginForm").style.display = "block";
+  document.getElementById("adminDataDashboard").style.display = "none";
+  closeAdminModal();
+}
+
+function loadAdminServerData() {
+  // Render Data Afiliasi
+  let users = JSON.parse(localStorage.getItem('aff_users')) || [];
+  let htmlUsers = "";
+  if(users.length === 0) {
+    htmlUsers = "<p>Belum ada afiliasi yang mendaftar.</p>";
+  } else {
+    htmlUsers = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
+    htmlUsers += "<tr style='background:#eef5ff;'><th>Nama</th><th>No HP</th><th>No DANA</th><th>Komisi</th><th>Tanggal</th></tr>";
+    users.forEach(u => {
+      htmlUsers += `<tr><td>${u.nama}</td><td>${u.noHp}</td><td><b>${u.noDana}</b></td><td>Rp ${(u.komisi||0).toLocaleString('id-ID')}</td><td>${u.tanggal || '-'}</td></tr>`;
+    });
+    htmlUsers += "</table>";
+  }
+  document.getElementById("listAffiliateServer").innerHTML = htmlUsers;
+
+  // Render Data Riwayat & Bukti Penarikan
+  let withdraws = JSON.parse(localStorage.getItem('aff_withdraws')) || [];
+  let htmlWithdraws = "";
+  if(withdraws.length === 0) {
+    htmlWithdraws = "<p>Belum ada riwayat penarikan komisi.</p>";
+  } else {
+    htmlWithdraws = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
+    htmlWithdraws += "<tr style='background:#d4edda;'><th>Nama</th><th>No DANA</th><th>Nominal</th><th>Bukti/Keterangan</th><th>Waktu</th></tr>";
+    withdraws.forEach(w => {
+      htmlWithdraws += `<tr><td>${w.nama}</td><td><b>${w.noDana}</b></td><td>Rp ${w.nominal.toLocaleString('id-ID')}</td><td>${w.bukti}</td><td>${w.waktu}</td></tr>`;
+    });
+    htmlWithdraws += "</table>";
+  }
+  document.getElementById("listPenarikanServer").innerHTML = htmlWithdraws;
+}
+</script>
+
+</body>
+</html>
