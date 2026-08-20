@@ -72,6 +72,32 @@
     font-size: 13px;
   }
 
+  /* CSS KHUSUS FORM BURAM & TERKUNCI */
+  .form-locked-wrapper {
+    position: relative;
+  }
+  .form-blur-overlay {
+    filter: blur(6px);
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.4;
+  }
+  .lock-banner {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    background: white;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    text-align: center;
+    border: 2px solid #0056b3;
+    width: 90%;
+    max-width: 350px;
+  }
+
   .modal-overlay {
     display: none;
     position: fixed;
@@ -143,6 +169,7 @@
 <body>
 
 <div class="form-container">
+  <!-- BAGIAN ATAS (TETEP TERLIHAT NORMAL) -->
   <div class="aff-top-bar" id="userTopBar">
     <div>👤 <b>Tamu</b></div>
     <div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>
@@ -153,39 +180,52 @@
     <p>Harga Promo: Rp 55.000</p>
   </div>
   
-  <form id="orderForm" onsubmit="openOverlay(event)">
-    <div class="form-group">
-      <label>Nama Owner</label>
-      <input type="text" id="namaOwner" placeholder="Masukkan nama pemilik usaha" required>
+  <!-- BAGIAN FORM PEMESANAN (DIBURAMKAN JIKA BELUM ADA AKSES) -->
+  <div class="form-locked-wrapper">
+    
+    <!-- Banner Pemberitahuan di Tengah Form yang Buram -->
+    <div id="lockBanner" class="lock-banner">
+      <h3 style="margin:0 0 8px; color:#0056b3; font-size:16px;">🔒 Form Terkunci</h3>
+      <p style="margin:0 0 12px; font-size:12px; color:#555;">Gunakan link referal atau login/daftar affiliate terlebih dahulu untuk membuka formulir ini.</p>
+      <button type="button" class="btn-custom" onclick="openAuthModal()" style="margin-top:0; padding:8px; font-size:13px;">Login / Daftar Sekarang</button>
     </div>
 
-    <div class="form-group">
-      <label>Nama Toko / Usaha</label>
-      <input type="text" id="namaToko" placeholder="Masukkan nama toko Anda" required>
-    </div>
+    <!-- Elemen Form -->
+    <form id="orderForm" class="form-blur-overlay" onsubmit="openOverlay(event)">
+      <div class="form-group">
+        <label>Nama Owner</label>
+        <input type="text" id="namaOwner" placeholder="Masukkan nama pemilik usaha" required>
+      </div>
 
-    <div class="form-group">
-      <label>No. WA / HP</label>
-      <input type="tel" id="whatsapp" placeholder="Contoh: 08123456789" required>
-    </div>
+      <div class="form-group">
+        <label>Nama Toko / Usaha</label>
+        <input type="text" id="namaToko" placeholder="Masukkan nama toko Anda" required>
+      </div>
 
-    <div class="form-group">
-      <label>Email Pribadi</label>
-      <input type="email" id="email" placeholder="contoh@gmail.com" required>
-    </div>
+      <div class="form-group">
+        <label>No. WA / HP</label>
+        <input type="tel" id="whatsapp" placeholder="Contoh: 08123456789" required>
+      </div>
 
-    <div class="form-group">
-      <label>Alamat Bisnis</label>
-      <textarea id="alamatBisnis" rows="3" placeholder="Masukkan alamat lengkap usaha/bisnis" required></textarea>
-    </div>
+      <div class="form-group">
+        <label>Email Pribadi</label>
+        <input type="email" id="email" placeholder="contoh@gmail.com" required>
+      </div>
 
-    <div class="form-group">
-      <label>Kode Referal (No. Dana Affiliate)</label>
-      <input type="text" id="kodeReferalInput" placeholder="Otomatis terisi jika dari link affiliate" readonly style="background-color: #e9ecef;">
-    </div>
+      <div class="form-group">
+        <label>Alamat Bisnis</label>
+        <textarea id="alamatBisnis" rows="3" placeholder="Masukkan alamat lengkap usaha/bisnis" required></textarea>
+      </div>
 
-    <button type="submit" class="btn-next">💳 LANJUT KE PEMBAYARAN QRIS</button>
-  </form>
+      <div class="form-group">
+        <label>Kode Referal (No. Dana Affiliate)</label>
+        <input type="text" id="kodeReferalInput" placeholder="Otomatis terisi jika dari link affiliate" readonly style="background-color: #e9ecef;">
+      </div>
+
+      <button type="submit" class="btn-next">💳 LANJUT KE PEMBAYARAN QRIS</button>
+    </form>
+
+  </div>
 </div>
 
 <div class="admin-trigger">
@@ -515,14 +555,30 @@ function processLogout() {
 
 function checkLoginStatus() {
   let loggedUser = JSON.parse(localStorage.getItem('aff_logged_in'));
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get('ref');
+
   let topBar = document.getElementById("userTopBar");
   let authContainer = document.getElementById("authContainer");
   let dashboardSection = document.getElementById("dashboardSection");
 
+  // CEK APAKAH ADA AKSES (DARI URL REF ATAU SUDAH LOGIN)
+  let hasAccess = refCode || loggedUser;
+
+  if (hasAccess) {
+    // Buka Buram Form
+    document.getElementById("orderForm").classList.remove("form-blur-overlay");
+    document.getElementById("lockBanner").style.display = "none";
+  } else {
+    // Buramkan Form
+    document.getElementById("orderForm").classList.add("form-blur-overlay");
+    document.getElementById("lockBanner").style.display = "block";
+  }
+
   if(loggedUser) {
     topBar.innerHTML = `<div>👤 <b>${loggedUser.nama}</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Dashboard</a></div>`;
-    authContainer.style.display = "none";
-    dashboardSection.style.display = "block";
+    if(authContainer) authContainer.style.display = "none";
+    if(dashboardSection) dashboardSection.style.display = "block";
 
     document.getElementById("dashNama").innerText = loggedUser.nama;
     document.getElementById("dashEmail").innerText = loggedUser.email || "-";
@@ -541,8 +597,8 @@ function checkLoginStatus() {
     document.getElementById("dashLinkRef").value = currentUrl + "?ref=" + loggedUser.noDana;
   } else {
     topBar.innerHTML = `<div>👤 <b>Tamu</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>`;
-    authContainer.style.display = "block";
-    dashboardSection.style.display = "none";
+    if(authContainer) authContainer.style.display = "block";
+    if(dashboardSection) dashboardSection.style.display = "none";
   }
 }
 
@@ -576,7 +632,7 @@ function tarikKomisi() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   }).then(() => {
-    alert("Penarikan saldo berhasil! Komisi 50% akan diterima <24 jam.");
+    alert("Penarikan saldo berhasil! Komisi akan segera diproses.");
     
     localStorage.setItem('aff_komisi_' + loggedUser.noDana, 0);
     localStorage.setItem('aff_leads_' + loggedUser.noDana, 0);
