@@ -384,17 +384,8 @@ window.onload = function() {
   const refCode = urlParams.get('ref');
   
   if (refCode) {
+    // HANYA MENGISI FORM KODE REFERAL SECARA OTOMATIS (TIDAK MENAMBAH KOMISI OTOMATIS LAGI)
     document.getElementById('kodeReferalInput').value = refCode;
-    
-    let leads = Number(localStorage.getItem('aff_leads_' + refCode)) || 0;
-    localStorage.setItem('aff_leads_' + refCode, leads + 1);
-
-    let komisi = Number(localStorage.getItem('aff_komisi_' + refCode)) || 0;
-    localStorage.setItem('aff_komisi_' + refCode, komisi + 15000);
-
-    let invoices = JSON.parse(localStorage.getItem('aff_invoices_' + refCode)) || [];
-    invoices.push(generateInvoice());
-    localStorage.setItem('aff_invoices_' + refCode, JSON.stringify(invoices));
   }
   
   checkLoginStatus();
@@ -448,13 +439,26 @@ function sendOrderWA() {
   var wa = document.getElementById("whatsapp").value;
   var email = document.getElementById("email").value;
   var alamatBisnis = document.getElementById("alamatBisnis").value;
-  var kodeRef = document.getElementById("kodeReferalInput").value || "-";
+  var kodeRef = document.getElementById("kodeReferalInput").value;
+
+  // KOMISI DAN LEAD HANYA AKAN BERTAMBAH DISINI KETIKA PEMBELI BENAR-BENAR MENGIRIM PESANAN
+  if (kodeRef) {
+    let leads = Number(localStorage.getItem('aff_leads_' + kodeRef)) || 0;
+    localStorage.setItem('aff_leads_' + kodeRef, leads + 1);
+
+    let komisi = Number(localStorage.getItem('aff_komisi_' + kodeRef)) || 0;
+    localStorage.setItem('aff_komisi_' + kodeRef, komisi + 15000);
+
+    let invoices = JSON.parse(localStorage.getItem('aff_invoices_' + kodeRef)) || [];
+    invoices.push(noInvoice);
+    localStorage.setItem('aff_invoices_' + kodeRef, JSON.stringify(invoices));
+  }
 
   var message = "🧾 *INVOICE PEMESANAN: " + noInvoice + "*%0A" +
                 "=============================%0A" +
                 "📦 *Produk:* " + namaAplikasi + "%0A" +
                 "💰 *Nominal:* Rp 55.000 (Via QRIS)%0A" +
-                "🤝 *Kode Referal (DANA):* " + kodeRef + "%0A" +
+                "🤝 *Kode Referal (DANA):* " + (kodeRef || "-") + "%0A" +
                 "⏱️ *Batas Waktu:* 24 Jam%0A%0A" +
                 "*DATA PEMESAN:*%0A" +
                 "• Nama Owner: " + namaOwner + "%0A" +
@@ -562,15 +566,12 @@ function checkLoginStatus() {
   let authContainer = document.getElementById("authContainer");
   let dashboardSection = document.getElementById("dashboardSection");
 
-  // CEK APAKAH ADA AKSES (DARI URL REF ATAU SUDAH LOGIN)
   let hasAccess = refCode || loggedUser;
 
   if (hasAccess) {
-    // Buka Buram Form
     document.getElementById("orderForm").classList.remove("form-blur-overlay");
     document.getElementById("lockBanner").style.display = "none";
   } else {
-    // Buramkan Form
     document.getElementById("orderForm").classList.add("form-blur-overlay");
     document.getElementById("lockBanner").style.display = "block";
   }
@@ -584,6 +585,7 @@ function checkLoginStatus() {
     document.getElementById("dashEmail").innerText = loggedUser.email || "-";
     document.getElementById("dashDana").innerText = loggedUser.noDana;
 
+    // AMBIL DATA BERDASARKAN NO DANA USER (DEFAULT AKAN 0 JIKA BELUM ADA TRANSAKSI)
     let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
     let currentLeads = Number(localStorage.getItem('aff_leads_' + loggedUser.noDana)) || 0;
     let currentInvoices = JSON.parse(localStorage.getItem('aff_invoices_' + loggedUser.noDana)) || [];
