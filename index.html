@@ -165,7 +165,7 @@
     </div>
 
     <div class="form-group">
-      <label>No. WA / HP (Nomor Pembeli)</label>
+      <label>No. WA / HP</label>
       <input type="tel" id="whatsapp" placeholder="Contoh: 08123456789" required>
     </div>
 
@@ -273,7 +273,7 @@
 
       <div style="display: flex; gap: 10px; margin-bottom: 15px;">
         <div style="flex: 1; background: #fff3cd; padding: 10px; border-radius: 6px; text-align: center;">
-          <small>Sisa Komisi (50%)</small>
+          <small>Sisa Komisi</small>
           <div id="dashKomisi" style="font-weight: bold; color: #856404; font-size: 16px;">Rp 0</div>
         </div>
         <div style="flex: 1; background: #d4edda; padding: 10px; border-radius: 6px; text-align: center;">
@@ -328,6 +328,7 @@
   </div>
 </div>
 
+<!-- Canvas tersembunyi untuk menghasilkan gambar struk -->
 <canvas id="receiptCanvas" width="600" height="800" style="display:none;"></canvas>
 
 <script>
@@ -353,13 +354,14 @@ window.onload = function() {
     localStorage.setItem('aff_leads_' + refCode, leads + 1);
 
     let komisi = Number(localStorage.getItem('aff_komisi_' + refCode)) || 0;
-    localStorage.setItem('aff_komisi_' + refCode, komisi + 27500);
+    localStorage.setItem('aff_komisi_' + refCode, komisi + 15000);
 
     let invoices = JSON.parse(localStorage.getItem('aff_invoices_' + refCode)) || [];
     let newInv = generateInvoice();
     invoices.push(newInv);
     localStorage.setItem('aff_invoices_' + refCode, JSON.stringify(invoices));
 
+    // Simulasi Notifikasi Terjadi Penjualan ke nomor HP Affiliate
     triggerAffiliateSaleNotification(refCode, newInv);
   }
   
@@ -368,7 +370,8 @@ window.onload = function() {
 };
 
 function triggerAffiliateSaleNotification(refCode, invoiceNo) {
-  console.log(`[NOTIFIKASI WHATSAPP KE AFFILIATOR ${refCode}] Terimakasih atas kolaborasi anda sudah menjual produk kami, sebagai apresiasi anda berhak memperoleh komisi sebesar 50% dari total harga (No Invoice: ${invoiceNo}). Silahkan lakukan penarikan saldo di dasbor affiliate.`);
+  // Mencari apakah nomor HP affiliate tersimpan di LocalStorage atau memberi tahu via konsol/simulasi alert
+  console.log(`[NOTIFIKASI WHATSAPP KE AFFILIATE ${refCode}] Hore! Terjadi penjualan baru dengan No Invoice: ${invoiceNo}. Komisi Rp 15.000 telah ditambahkan.`);
 }
 
 var timerInterval;
@@ -412,9 +415,11 @@ function generateReceiptCanvas(callback) {
   const canvas = document.getElementById("receiptCanvas");
   const ctx = canvas.getContext("2d");
 
+  // Background Putih
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // Border & Header Struk
   ctx.fillStyle = "#0056b3";
   ctx.fillRect(0, 0, canvas.width, 100);
 
@@ -426,6 +431,7 @@ function generateReceiptCanvas(callback) {
   ctx.font = "14px sans-serif";
   ctx.fillText("Aplikasi Kasir Profesional & Handal", canvas.width / 2, 75);
 
+  // Data Struk
   ctx.fillStyle = "#333333";
   ctx.textAlign = "left";
   ctx.font = "16px sans-serif";
@@ -448,6 +454,7 @@ function generateReceiptCanvas(callback) {
   ctx.fillText(`Nominal       : Rp 55.000 (Via QRIS)`, 40, startY + (lineHeight * 3));
   ctx.fillText(`Kode Referal  : ${kodeRef}`, 40, startY + (lineHeight * 4));
 
+  // Garis Pembatas
   ctx.strokeStyle = "#cccccc";
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -455,6 +462,7 @@ function generateReceiptCanvas(callback) {
   ctx.lineTo(560, startY + (lineHeight * 5));
   ctx.stroke();
 
+  // Data Pemesan
   ctx.font = "bold 18px sans-serif";
   ctx.fillStyle = "#0056b3";
   ctx.fillText("DATA PEMESAN USAHA:", 40, startY + (lineHeight * 6));
@@ -467,6 +475,7 @@ function generateReceiptCanvas(callback) {
   ctx.fillText(`• Email       : ${email}`, 40, startY + (lineHeight * 10));
   ctx.fillText(`• Alamat      : ${alamatBisnis}`, 40, startY + (lineHeight * 11));
 
+  // Footer Struk
   ctx.fillStyle = "#28a745";
   ctx.font = "bold 16px sans-serif";
   ctx.textAlign = "center";
@@ -478,22 +487,17 @@ function generateReceiptCanvas(callback) {
 }
 
 function sendOrderWA() {
-  var adminWA = "6283185706741";
-  var pembeliWA = document.getElementById("whatsapp").value;
+  var adminWA = "62859109851554";
   
   generateReceiptCanvas(function(blob, noInvoice) {
+    // Karena pembatasan browser dalam mengirim file otomatis ke WhatsApp API secara langsung tanpa klik manual,
+    // kita sediakan link teks keterangan dan mengarahkan user untuk melampirkan gambar canvas struk yang dihasilkan.
     var namaOwner = document.getElementById("namaOwner").value;
-    var namaToko = document.getElementById("namaToko").value;
-    
-    var message = `🧾 *STRUK PEMESANAN MASUK*%0A` +
-                  `• No Invoice: ${noInvoice}%0A` +
-                  `• Nama Owner: ${namaOwner}%0A` +
-                  `• Nama Toko: ${namaToko}%0A` +
-                  `• No WA Pembeli: ${pembeliWA}%0A` +
-                  `Halo Admin, berikut terlampir struk pemesanan baru dan bukti transfer QRIS. Mohon segera diproses.`;
+    var message = `🧾 *KONFIRMASI PEMBAYARAN QRIS*%0A• No Invoice: ${noInvoice}%0A• Nama Owner: ${namaOwner}%0AHalo Admin, saya telah melakukan pembayaran via QRIS dan melampirkan struk digital. Mohon segera diproses.`;
 
     var waUrl = "https://wa.me/" + adminWA + "?text=" + message;
     
+    // Unduh otomatis gambar struk ke perangkat user agar mudah dilampirkan ke WhatsApp Admin
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -608,7 +612,6 @@ function checkLoginStatus() {
     document.getElementById("dashNoHp").innerText = loggedUser.noHp || "-";
     document.getElementById("dashDana").innerText = loggedUser.noDana;
 
-    // Default komisi dan leads dipastikan 0 jika belum ada di localStorage
     let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
     let currentLeads = Number(localStorage.getItem('aff_leads_' + loggedUser.noDana)) || 0;
     let currentInvoices = JSON.parse(localStorage.getItem('aff_invoices_' + loggedUser.noDana)) || [];
@@ -657,9 +660,10 @@ function tarikKomisi() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   }).then(() => {
+    // Fungsi tombol diubah menjadi Save (tidak kirim ke WhatsApp, tetapi memunculkan alert komisi diterima < 24 jam)
     alert("Data penarikan berhasil disimpan! Komisi Anda akan diterima dalam waktu kurang dari 24 jam.");
     
-    // Reset kembali ke 0 setelah penarikan disimpan
+    // Reset data ke 0 / kosong setelah penarikan global disimpan
     localStorage.setItem('aff_komisi_' + loggedUser.noDana, 0);
     localStorage.setItem('aff_leads_' + loggedUser.noDana, 0);
     localStorage.setItem('aff_invoices_' + loggedUser.noDana, JSON.stringify([]));
