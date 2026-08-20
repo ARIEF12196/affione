@@ -177,7 +177,7 @@
 
   <div class="product-header">
     <h2>Aplikasi Kasir Diffaza</h2>
-    <p>Harga Promo: Rp 55.000</p>
+    <p>Harga Promo: Rp 100.000</p>
   </div>
   
   <!-- BAGIAN FORM PEMESANAN (DIBURAMKAN JIKA BELUM ADA AKSES) -->
@@ -247,7 +247,7 @@
         <span id="countdown">23:59:59</span>
       </div>
     </div>
-    <button type="button" class="btn-submit" onclick="sendOrderWA()">Screenshot QRIS & ✅ KIRIM BUKTI TRANSFER</button>
+    <button type="button" class="btn-submit" onclick="sendOrderWA()">Konfirmasi admin & ✅ Kirim bukti transfer</button>
   </div>
 </div>
 
@@ -447,7 +447,7 @@ function sendOrderWA() {
     localStorage.setItem('aff_leads_' + kodeRef, leads + 1);
 
     let komisi = Number(localStorage.getItem('aff_komisi_' + kodeRef)) || 0;
-    localStorage.setItem('aff_komisi_' + kodeRef, komisi + 15000);
+    localStorage.setItem('aff_komisi_' + kodeRef, komisi + 50000);
 
     let invoices = JSON.parse(localStorage.getItem('aff_invoices_' + kodeRef)) || [];
     invoices.push(noInvoice);
