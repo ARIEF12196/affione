@@ -43,7 +43,6 @@
     box-shadow: 0 0 5px rgba(0, 86, 179, 0.3);
   }
 
-  /* TOMBOL UTAMA */
   .btn-next, .btn-submit, .btn-custom {
     width: 100%;
     background-color: #0056b3;
@@ -132,7 +131,6 @@
   .tab-nav button { background: none; border: none; padding: 8px 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 12px; }
   .tab-nav button.active { background: #0056b3; color: white; }
 
-  /* Tombol Akses Admin Rahasia di bawah halaman */
   .admin-trigger {
     text-align: center;
     margin-top: 30px;
@@ -145,13 +143,11 @@
 <body>
 
 <div class="form-container">
-  <!-- DASHBOARD / INFO USER DI POJOK KANAN ATAS -->
   <div class="aff-top-bar" id="userTopBar">
     <div>👤 <b>Tamu</b></div>
     <div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>
   </div>
 
-  <!-- Header Produk -->
   <div class="product-header">
     <h2>Aplikasi Kasir Diffaza</h2>
     <p>Harga Promo: Rp 55.000</p>
@@ -169,7 +165,7 @@
     </div>
 
     <div class="form-group">
-      <label>No. WA / HP</label>
+      <label>No. WA / HP (Nomor Pembeli)</label>
       <input type="tel" id="whatsapp" placeholder="Contoh: 08123456789" required>
     </div>
 
@@ -192,12 +188,10 @@
   </form>
 </div>
 
-<!-- LINK MASUK ADMIN RAHASIA -->
 <div class="admin-trigger">
   <a href="#" onclick="openAdminLogin(event)">🔒 Panel Khusus Admin Server</a>
 </div>
 
-<!-- POP-UP OVERLAY PEMBAYARAN -->
 <div id="paymentModal" class="modal-overlay">
   <div class="modal-content">
     <span class="close-btn" onclick="closeOverlay()">&times;</span>
@@ -217,7 +211,6 @@
   </div>
 </div>
 
-<!-- POP-UP MODAL AUTH & DASHBOARD AFFILIATE -->
 <div id="authModal" class="modal-overlay">
   <div class="modal-content" style="text-align: left;">
     <span class="close-btn" onclick="closeAuthModal()">&times;</span>
@@ -248,7 +241,11 @@
           <input type="text" id="regNama" placeholder="Nama Anda">
         </div>
         <div class="form-group">
-          <label>No. HP / WhatsApp</label>
+          <label>Email Pendaftaran</label>
+          <input type="email" id="regEmail" placeholder="emailanda@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>No. HP / WhatsApp (Untuk Notifikasi Penjualan)</label>
           <input type="tel" id="regNoHp" placeholder="08xxxxxxxxxx">
         </div>
         <div class="form-group">
@@ -263,11 +260,12 @@
       </div>
     </div>
 
-    <!-- DASHBOARD AFFILIATE -->
     <div id="dashboardSection" style="display: none;">
       <h3 style="color:#0056b3; margin-top:0;">Dashboard Affiliate</h3>
       <div style="background: #eef5ff; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
         <p style="margin:0 0 5px;">👤 Halo, <b id="dashNama"></b></p>
+        <p style="margin:0 0 5px;">📧 Email: <b id="dashEmail"></b></p>
+        <p style="margin:0 0 5px;">📱 No. HP/WA Notifikasi: <b id="dashNoHp"></b></p>
         <p style="margin:0 0 5px;">📱 No. DANA: <b id="dashDana"></b></p>
         <p style="margin:0;">🔗 Link Referral Anda:</p>
         <input type="text" id="dashLinkRef" readonly style="background: #fff; margin-top: 5px; font-size: 11px;">
@@ -275,7 +273,7 @@
 
       <div style="display: flex; gap: 10px; margin-bottom: 15px;">
         <div style="flex: 1; background: #fff3cd; padding: 10px; border-radius: 6px; text-align: center;">
-          <small>Sisa Komisi</small>
+          <small>Sisa Komisi (50%)</small>
           <div id="dashKomisi" style="font-weight: bold; color: #856404; font-size: 16px;">Rp 0</div>
         </div>
         <div style="flex: 1; background: #d4edda; padding: 10px; border-radius: 6px; text-align: center;">
@@ -285,20 +283,24 @@
       </div>
 
       <div class="form-group">
+        <label>Seluruh Data Invoice Pembelian (Global)</label>
+        <textarea id="invoicePembeli" rows="3" readonly style="background-color: #e9ecef; font-weight: bold; color: #0056b3; font-size: 12px;"></textarea>
+      </div>
+
+      <div class="form-group">
         <label>Unggah / Tulis Keterangan Bukti Komisi (Opsional)</label>
         <input type="text" id="buktiPenarikan" placeholder="Cth: ID Transaksi / Screenshot terlampir">
       </div>
 
-      <button type="button" class="btn-submit" onclick="tarikKomisi()" style="margin-bottom: 8px;">💸 TARIK KOMISI & KIRIM BUKTI KE ADMIN</button>
+      <button type="button" class="btn-submit" onclick="tarikKomisi()" style="margin-bottom: 8px;">💾 SAVE / SIMPAN PENARIKAN KOMISI</button>
       <button type="button" class="btn-custom" onclick="processLogout()" style="background-color: #dc3545;">Keluar (Logout)</button>
     </div>
 
   </div>
 </div>
 
-<!-- MODAL PANEL ADMIN (SERVER LOKAL / DATABASE SIMULASI) -->
 <div id="adminModal" class="modal-overlay">
-  <div class="modal-content" style="max-width: 600px; text-align: left; max-height: 90vh; overflow-y: auto;">
+  <div class="modal-content" style="max-width: 650px; text-align: left; max-height: 90vh; overflow-y: auto;">
     <span class="close-btn" onclick="closeAdminModal()">&times;</span>
     <h3 style="color: #0056b3; margin-top: 0;">🔒 Server Dashboard Admin</h3>
     
@@ -311,14 +313,14 @@
     </div>
 
     <div id="adminDataDashboard" style="display: none;">
-      <h4 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #333;">📋 Database Daftar Affiliate</h4>
+      <h4 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #333;">📋 Database Daftar Affiliate (Online Sheets)</h4>
       <div id="listAffiliateServer" style="font-size: 12px; margin-bottom: 20px; max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
-        <!-- Data Afiliasi Masuk Disini -->
+        Memuat data dari server...
       </div>
 
       <h4 style="border-bottom: 2px solid #28a745; padding-bottom: 5px; color: #333;">💸 Riwayat & Bukti Permintaan Tarik Komisi</h4>
       <div id="listPenarikanServer" style="font-size: 12px; margin-bottom: 15px; max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
-        <!-- Data Penarikan Masuk Disini -->
+        Memuat data dari server...
       </div>
 
       <button type="button" class="btn-custom" onclick="lockAdmin()" style="background-color: #6c757d;">Kunci Kembali Admin</button>
@@ -326,18 +328,51 @@
   </div>
 </div>
 
+<!-- Canvas tersembunyi untuk menghasilkan gambar struk -->
+<canvas id="receiptCanvas" width="600" height="800" style="display:none;"></canvas>
+
 <script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwP-YqAviVJd0eiAFExDtLXODhdrwPQ1qQbZxnNCcW0OxU7LZM7UI4DoND6V5N1Ap6TBw/exec";
+
+function generateInvoice() {
+  var date = new Date();
+  var dateStr = date.getFullYear().toString() +
+                ("0" + (date.getMonth() + 1)).slice(-2) +
+                ("0" + date.getDate()).slice(-2);
+  var randomNum = Math.floor(1000 + Math.random() * 9000);
+  return "DFZ-" + dateStr + "-" + randomNum;
+}
+
 window.onload = function() {
   const urlParams = new URLSearchParams(window.location.search);
   const refCode = urlParams.get('ref');
+  
   if (refCode) {
     document.getElementById('kodeReferalInput').value = refCode;
-    let leads = JSON.parse(localStorage.getItem('aff_leads_' + refCode)) || 0;
+    
+    let leads = Number(localStorage.getItem('aff_leads_' + refCode)) || 0;
     localStorage.setItem('aff_leads_' + refCode, leads + 1);
+
+    // Komisi 50% dari total harga Rp 55.000 = Rp 27.500
+    let komisi = Number(localStorage.getItem('aff_komisi_' + refCode)) || 0;
+    localStorage.setItem('aff_komisi_' + refCode, komisi + 27500);
+
+    let invoices = JSON.parse(localStorage.getItem('aff_invoices_' + refCode)) || [];
+    let newInv = generateInvoice();
+    invoices.push(newInv);
+    localStorage.setItem('aff_invoices_' + refCode, JSON.stringify(invoices));
+
+    // Simulasi Pengiriman Notifikasi ke WhatsApp Affiliator
+    triggerAffiliateSaleNotification(refCode, newInv);
   }
+  
   checkLoginStatus();
   startTimer();
 };
+
+function triggerAffiliateSaleNotification(refCode, invoiceNo) {
+  console.log(`[NOTIFIKASI WHATSAPP KE AFFILIATOR ${refCode}] Terimakasih atas kolaborasi anda sudah menjual produk kami, sebagai apresiasi anda berhak memperoleh komisi sebesar 50% dari total harga (No Invoice: ${invoiceNo}). Silahkan lakukan penarikan saldo di dasbor affiliate.`);
+}
 
 var timerInterval;
 function startTimer() {
@@ -376,46 +411,107 @@ function closeOverlay() {
   document.getElementById("paymentModal").style.display = "none";
 }
 
-function generateInvoice() {
-  var date = new Date();
-  var dateStr = date.getFullYear().toString() +
-                ("0" + (date.getMonth() + 1)).slice(-2) +
-                ("0" + date.getDate()).slice(-2);
-  var randomNum = Math.floor(1000 + Math.random() * 9000);
-  return "DFZ-" + dateStr + "-" + randomNum;
-}
+function generateReceiptCanvas(callback) {
+  const canvas = document.getElementById("receiptCanvas");
+  const ctx = canvas.getContext("2d");
 
-function sendOrderWA() {
-  var adminWA = "62859109851554";
-  var namaAplikasi = "Aplikasi Kasir Diffaza";
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#0056b3";
+  ctx.fillRect(0, 0, canvas.width, 100);
+
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 26px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("INVOICE PEMBAYARAN DIFAZA", canvas.width / 2, 45);
+
+  ctx.font = "14px sans-serif";
+  ctx.fillText("Aplikasi Kasir Profesional & Handal", canvas.width / 2, 75);
+
+  ctx.fillStyle = "#333333";
+  ctx.textAlign = "left";
+  ctx.font = "16px sans-serif";
+
   var noInvoice = generateInvoice();
-  
   var namaOwner = document.getElementById("namaOwner").value;
   var namaToko = document.getElementById("namaToko").value;
   var wa = document.getElementById("whatsapp").value;
   var email = document.getElementById("email").value;
   var alamatBisnis = document.getElementById("alamatBisnis").value;
   var kodeRef = document.getElementById("kodeReferalInput").value || "-";
+  var waktuTrans = new Date().toLocaleString();
 
-  var message = "🧾 *INVOICE PEMESANAN: " + noInvoice + "*%0A" +
-                "=============================%0A" +
-                "📦 *Produk:* " + namaAplikasi + "%0A" +
-                "💰 *Nominal:* Rp 55.000 (Via QRIS)%0A" +
-                "🤝 *Kode Referal (DANA):* " + kodeRef + "%0A" +
-                "⏱️ *Batas Waktu:* 24 Jam%0A%0A" +
-                "*DATA PEMESAN:*%0A" +
-                "• Nama Owner: " + namaOwner + "%0A" +
-                "• Nama Toko: " + namaToko + "%0A" +
-                "• No. WA/HP: " + wa + "%0A" +
-                "• Email Pribadi: " + email + "%0A" +
-                "• Alamat Bisnis: " + alamatBisnis + "%0A%0A" +
-                "Halo Admin, saya telah melakukan pemesanan via QRIS.";
+  let startY = 140;
+  let lineHeight = 30;
 
-  var waUrl = "https://wa.me/" + adminWA + "?text=" + message;
-  window.open(waUrl, '_blank');
+  ctx.fillText(`No Invoice    : ${noInvoice}`, 40, startY);
+  ctx.fillText(`Waktu         : ${waktuTrans}`, 40, startY + lineHeight);
+  ctx.fillText(`Produk        : Aplikasi Kasir Diffaza`, 40, startY + (lineHeight * 2));
+  ctx.fillText(`Nominal       : Rp 55.000 (Via QRIS)`, 40, startY + (lineHeight * 3));
+  ctx.fillText(`Kode Referal  : ${kodeRef}`, 40, startY + (lineHeight * 4));
+
+  ctx.strokeStyle = "#cccccc";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(40, startY + (lineHeight * 5));
+  ctx.lineTo(560, startY + (lineHeight * 5));
+  ctx.stroke();
+
+  ctx.font = "bold 18px sans-serif";
+  ctx.fillStyle = "#0056b3";
+  ctx.fillText("DATA PEMESAN USAHA:", 40, startY + (lineHeight * 6));
+
+  ctx.font = "16px sans-serif";
+  ctx.fillStyle = "#333333";
+  ctx.fillText(`• Nama Owner  : ${namaOwner}`, 40, startY + (lineHeight * 7));
+  ctx.fillText(`• Nama Toko   : ${namaToko}`, 40, startY + (lineHeight * 8));
+  ctx.fillText(`• No. WA/HP   : ${wa}`, 40, startY + (lineHeight * 9));
+  ctx.fillText(`• Email       : ${email}`, 40, startY + (lineHeight * 10));
+  ctx.fillText(`• Alamat      : ${alamatBisnis}`, 40, startY + (lineHeight * 11));
+
+  ctx.fillStyle = "#28a745";
+  ctx.font = "bold 16px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("STATUS: MENUNGGU KONFIRMASI / BUKTI TRANSFER", canvas.width / 2, startY + (lineHeight * 13));
+
+  canvas.toBlob(function(blob) {
+    callback(blob, noInvoice);
+  }, "image/png");
 }
 
-// AUTH AFFILIATE
+function sendOrderWA() {
+  // Nomor Admin yang baru
+  var adminWA = "6283185706741";
+  var pembeliWA = document.getElementById("whatsapp").value;
+  
+  generateReceiptCanvas(function(blob, noInvoice) {
+    var namaOwner = document.getElementById("namaOwner").value;
+    var namaToko = document.getElementById("namaToko").value;
+    
+    // Pesan ke Admin dengan menyertakan nomor pembeli
+    var message = `🧾 *STRUK PEMESANAN MASUK (Seditkit)*%0A` +
+                  `• No Invoice: ${noInvoice}%0A` +
+                  `• Nama Owner: ${namaOwner}%0A` +
+                  `• Nama Toko: ${namaToko}%0A` +
+                  `• No WA Pembeli: ${pembeliWA}%0A` +
+                  `Halo Admin, berikut terlampir struk pemesanan baru dan bukti transfer QRIS. Mohon segera diproses.`;
+
+    var waUrl = "https://wa.me/" + adminWA + "?text=" + message;
+    
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Struk-Diffaza-${noInvoice}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    alert("Struk berhasil dibuat & diunduh otomatis! Silakan kirimkan file gambar struk tersebut ke WhatsApp Admin.");
+    window.open(waUrl, '_blank');
+  });
+}
+
 function openAuthModal() { document.getElementById("authModal").style.display = "flex"; }
 function closeAuthModal() { document.getElementById("authModal").style.display = "none"; }
 
@@ -435,44 +531,64 @@ function switchTab(type) {
 
 function processRegister() {
   var nama = document.getElementById("regNama").value;
+  var email = document.getElementById("regEmail").value;
   var noHp = document.getElementById("regNoHp").value;
   var noDana = document.getElementById("regNoDana").value;
   var pass = document.getElementById("regPassword").value;
 
-  if(!nama || !noHp || !noDana || !pass) {
+  if(!nama || !email || !noHp || !noDana || !pass) {
     alert("Semua kolom pendaftaran wajib diisi!");
     return;
   }
 
-  let users = JSON.parse(localStorage.getItem('aff_users')) || [];
-  if(users.some(u => u.noDana === noDana)) {
-    alert("Nomor DANA / Referal sudah terdaftar!");
-    return;
-  }
+  let payload = {
+    action: "register",
+    nama: nama,
+    email: email,
+    noHp: noHp,
+    noDana: noDana,
+    pass: pass,
+    komisi: 0,
+    tanggal: new Date().toLocaleString()
+  };
 
-  let newUser = { nama, noHp, noDana, pass, komisi: 15000, tanggal: new Date().toLocaleString() };
-  users.push(newUser);
-  localStorage.setItem('aff_users', JSON.stringify(users));
-
-  alert("Pendaftaran Berhasil! Silakan Login.");
-  switchTab('login');
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    alert("Pendaftaran Berhasil dan tersimpan di Server! Silakan Login.");
+    switchTab('login');
+  }).catch(err => {
+    alert("Terjadi kesalahan koneksi ke server.");
+    console.error(err);
+  });
 }
 
 function processLogin() {
   var noDana = document.getElementById("loginNoHp").value;
   var pass = document.getElementById("loginPassword").value;
 
-  let users = JSON.parse(localStorage.getItem('aff_users')) || [];
-  let foundUser = users.find(u => u.noDana === noDana && u.pass === pass);
+  fetch(SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
+      let users = data.users || [];
+      let foundUser = users.find(u => u.noDana == noDana && u.pass == pass);
 
-  if(foundUser) {
-    localStorage.setItem('aff_logged_in', JSON.stringify(foundUser));
-    alert("Login Berhasil!");
-    closeAuthModal();
-    checkLoginStatus();
-  } else {
-    alert("No DANA atau Password salah!");
-  }
+      if(foundUser) {
+        localStorage.setItem('aff_logged_in', JSON.stringify(foundUser));
+        alert("Login Berhasil!");
+        closeAuthModal();
+        checkLoginStatus();
+      } else {
+        alert("No DANA atau Password salah, atau belum terdaftar di database server!");
+      }
+    })
+    .catch(err => {
+      alert("Gagal memuat data dari server.");
+      console.error(err);
+    });
 }
 
 function processLogout() {
@@ -493,13 +609,20 @@ function checkLoginStatus() {
     dashboardSection.style.display = "block";
 
     document.getElementById("dashNama").innerText = loggedUser.nama;
+    document.getElementById("dashEmail").innerText = loggedUser.email || "-";
+    document.getElementById("dashNoHp").innerText = loggedUser.noHp || "-";
     document.getElementById("dashDana").innerText = loggedUser.noDana;
-    document.getElementById("dashKomisi").innerText = "Rp " + (loggedUser.komisi || 0).toLocaleString('id-ID');
-    
-    let leads = JSON.parse(localStorage.getItem('aff_leads_' + loggedUser.noDana)) || 0;
-    document.getElementById("dashLead").innerText = leads + " Orang";
 
-    let currentUrl = window.location.href.split('?')[0];
+    let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
+    let currentLeads = Number(localStorage.getItem('aff_leads_' + loggedUser.noDana)) || 0;
+    let currentInvoices = JSON.parse(localStorage.getItem('aff_invoices_' + loggedUser.noDana)) || [];
+
+    document.getElementById("dashKomisi").innerText = "Rp " + currentKomisi.toLocaleString('id-ID');
+    document.getElementById("dashLead").innerText = currentLeads + " Orang";
+    
+    document.getElementById("invoicePembeli").value = currentInvoices.length > 0 ? currentInvoices.join(", ") : "Belum ada data pembelian (0)";
+
+    let currentUrl = window.location.href.split('#')[0].split('?')[0];
     document.getElementById("dashLinkRef").value = currentUrl + "?ref=" + loggedUser.noDana;
   } else {
     topBar.innerHTML = `<div>👤 <b>Tamu</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>`;
@@ -510,56 +633,47 @@ function checkLoginStatus() {
 
 function tarikKomisi() {
   let loggedUser = JSON.parse(localStorage.getItem('aff_logged_in'));
-  if(!loggedUser || loggedUser.komisi <= 0) {
-    alert("Sisa komisi Anda masih kosong atau belum mencukupi.");
+  let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
+  let currentInvoices = JSON.parse(localStorage.getItem('aff_invoices_' + loggedUser.noDana)) || [];
+
+  if(!loggedUser || currentKomisi <= 0 || currentInvoices.length === 0) {
+    alert("Sisa komisi atau data invoice pembelian masih kosong (0).");
     return;
   }
 
-  let jumlahTarik = loggedUser.komisi;
+  let semuaInvoiceGlobal = currentInvoices.join(", ");
   let buktiInfo = document.getElementById("buktiPenarikan").value || "Tanpa Keterangan Tambahan";
 
-  // Simpan data penarikan ke database lokal server admin
-  let historyWithdraw = JSON.parse(localStorage.getItem('aff_withdraws')) || [];
-  let withdrawData = {
+  let payload = {
+    action: "withdraw",
     nama: loggedUser.nama,
+    email: loggedUser.email,
     noDana: loggedUser.noDana,
-    nominal: jumlahTarik,
+    invoice: semuaInvoiceGlobal,
+    nominal: currentKomisi,
     bukti: buktiInfo,
     waktu: new Date().toLocaleString()
   };
-  historyWithdraw.push(withdrawData);
-  localStorage.setItem('aff_withdraws', JSON.stringify(historyWithdraw));
 
-  // Kirim otomatis data penarikan dan bukti ke WhatsApp Admin (0859109851554)
-  let adminWA = "62859109851554";
-  let waMessage = "💸 *PERMINTAAN TARIK KOMISI AFFILIATE*%0A" +
-                  "=============================%0A" +
-                  "• Nama: " + loggedUser.nama + "%0A" +
-                  "• No. DANA: " + loggedUser.noDana + "%0A" +
-                  "• Jumlah Tarik: Rp " + jumlahTarik.toLocaleString('id-ID') + "%0A" +
-                  "• Bukti/Keterangan: " + buktiInfo + "%0A" +
-                  "• Waktu: " + withdrawData.waktu + "%0A%0A" +
-                  "Halo Admin, saya telah mengajukan penarikan komisi. Mohon segera diproses ke rekening DANA saya. Terima kasih!";
-
-  let waUrl = "https://wa.me/" + adminWA + "?text=" + waMessage;
-  window.open(waUrl, '_blank');
-
-  alert("Permintaan penarikan komisi berhasil diproses! Saldo anda akan sampai ke rekening DANA (" + loggedUser.noDana + ") < 24 jam.");
-  
-  // Reset komisi user
-  loggedUser.komisi = 0;
-  localStorage.setItem('aff_logged_in', JSON.stringify(loggedUser));
-
-  let users = JSON.parse(localStorage.getItem('aff_users')) || [];
-  users = users.map(u => {
-    if(u.noDana === loggedUser.noDana) u.komisi = 0;
-    return u;
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    alert("Data penarikan berhasil disimpan! Komisi Anda akan diterima dalam waktu kurang dari 24 jam.");
+    
+    localStorage.setItem('aff_komisi_' + loggedUser.noDana, 0);
+    localStorage.setItem('aff_leads_' + loggedUser.noDana, 0);
+    localStorage.setItem('aff_invoices_' + loggedUser.noDana, JSON.stringify([]));
+    
+    checkLoginStatus();
+  }).catch(err => {
+    alert("Gagal menyimpan data penarikan ke server.");
+    console.error(err);
   });
-  localStorage.setItem('aff_users', JSON.stringify(users));
-  checkLoginStatus();
 }
 
-// --- PANEL ADMIN RAHASIA ---
 function openAdminLogin(event) {
   event.preventDefault();
   document.getElementById("adminModal").style.display = "flex";
@@ -570,7 +684,6 @@ function closeAdminModal() {
 
 function verifyAdminLogin() {
   let pass = document.getElementById("adminPasswordInput").value;
-  // Ganti password admin di sini sesuai keinginan Anda (contoh: "admin123")
   if(pass === "admin123") {
     document.getElementById("adminLoginForm").style.display = "none";
     document.getElementById("adminDataDashboard").style.display = "block";
@@ -588,35 +701,45 @@ function lockAdmin() {
 }
 
 function loadAdminServerData() {
-  // Render Data Afiliasi
-  let users = JSON.parse(localStorage.getItem('aff_users')) || [];
-  let htmlUsers = "";
-  if(users.length === 0) {
-    htmlUsers = "<p>Belum ada afiliasi yang mendaftar.</p>";
-  } else {
-    htmlUsers = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
-    htmlUsers += "<tr style='background:#eef5ff;'><th>Nama</th><th>No HP</th><th>No DANA</th><th>Komisi</th><th>Tanggal</th></tr>";
-    users.forEach(u => {
-      htmlUsers += `<tr><td>${u.nama}</td><td>${u.noHp}</td><td><b>${u.noDana}</b></td><td>Rp ${(u.komisi||0).toLocaleString('id-ID')}</td><td>${u.tanggal || '-'}</td></tr>`;
-    });
-    htmlUsers += "</table>";
-  }
-  document.getElementById("listAffiliateServer").innerHTML = htmlUsers;
+  document.getElementById("listAffiliateServer").innerHTML = "Memuat data dari Google Sheets...";
+  document.getElementById("listPenarikanServer").innerHTML = "Memuat data dari Google Sheets...";
 
-  // Render Data Riwayat & Bukti Penarikan
-  let withdraws = JSON.parse(localStorage.getItem('aff_withdraws')) || [];
-  let htmlWithdraws = "";
-  if(withdraws.length === 0) {
-    htmlWithdraws = "<p>Belum ada riwayat penarikan komisi.</p>";
-  } else {
-    htmlWithdraws = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
-    htmlWithdraws += "<tr style='background:#d4edda;'><th>Nama</th><th>No DANA</th><th>Nominal</th><th>Bukti/Keterangan</th><th>Waktu</th></tr>";
-    withdraws.forEach(w => {
-      htmlWithdraws += `<tr><td>${w.nama}</td><td><b>${w.noDana}</b></td><td>Rp ${w.nominal.toLocaleString('id-ID')}</td><td>${w.bukti}</td><td>${w.waktu}</td></tr>`;
+  fetch(SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
+      let users = data.users || [];
+      let htmlUsers = "";
+      if(users.length === 0) {
+        htmlUsers = "<p>Belum ada afiliasi yang mendaftar.</p>";
+      } else {
+        htmlUsers = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
+        htmlUsers += "<tr style='background:#eef5ff;'><th>Nama</th><th>Email</th><th>No HP</th><th>No DANA</th><th>Komisi</th><th>Tanggal</th></tr>";
+        users.forEach(u => {
+          htmlUsers += `<tr><td>${u.nama}</td><td>${u.email || '-'}</td><td>${u.noHp}</td><td><b>${u.noDana}</b></td><td>Rp ${(Number(u.komisi)||0).toLocaleString('id-ID')}</td><td>${u.tanggal || '-'}</td></tr>`;
+        });
+        htmlUsers += "</table>";
+      }
+      document.getElementById("listAffiliateServer").innerHTML = htmlUsers;
+
+      let withdraws = data.withdraws || [];
+      let htmlWithdraws = "";
+      if(withdraws.length === 0) {
+        htmlWithdraws = "<p>Belum ada riwayat penarikan komisi.</p>";
+      } else {
+        htmlWithdraws = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
+        htmlWithdraws += "<tr style='background:#d4edda;'><th>Nama</th><th>Email</th><th>No DANA</th><th>Daftar Invoice Pembelian (Global)</th><th>Nominal</th><th>Keterangan</th><th>Waktu</th></tr>";
+        withdraws.forEach(w => {
+          htmlWithdraws += `<tr><td>${w.nama}</td><td>${w.email || '-'}</td><td><b>${w.noDana}</b></td><td><span style="color:#0056b3; font-weight:bold;">${w.invoice}</span></td><td>Rp ${Number(w.nominal).toLocaleString('id-ID')}</td><td>${w.bukti}</td><td>${w.waktu}</td></tr>`;
+        });
+        htmlWithdraws += "</table>";
+      }
+      document.getElementById("listPenarikanServer").innerHTML = htmlWithdraws;
+    })
+    .catch(err => {
+      document.getElementById("listAffiliateServer").innerHTML = "<p style='color:red;'>Gagal mengambil data dari server Google Sheets.</p>";
+      document.getElementById("listPenarikanServer").innerHTML = "<p style='color:red;'>Gagal mengambil data dari server Google Sheets.</p>";
+      console.error(err);
     });
-    htmlWithdraws += "</table>";
-  }
-  document.getElementById("listPenarikanServer").innerHTML = htmlWithdraws;
 }
 </script>
 
