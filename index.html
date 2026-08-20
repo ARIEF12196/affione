@@ -245,7 +245,7 @@
           <input type="email" id="regEmail" placeholder="emailanda@gmail.com">
         </div>
         <div class="form-group">
-          <label>No. HP / WhatsApp (Untuk Notifikasi Penjualan)</label>
+          <label>No. HP / WhatsApp</label>
           <input type="tel" id="regNoHp" placeholder="08xxxxxxxxxx">
         </div>
         <div class="form-group">
@@ -265,7 +265,6 @@
       <div style="background: #eef5ff; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
         <p style="margin:0 0 5px;">👤 Halo, <b id="dashNama"></b></p>
         <p style="margin:0 0 5px;">📧 Email: <b id="dashEmail"></b></p>
-        <p style="margin:0 0 5px;">📱 No. HP/WA Notifikasi: <b id="dashNoHp"></b></p>
         <p style="margin:0 0 5px;">📱 No. DANA: <b id="dashDana"></b></p>
         <p style="margin:0;">🔗 Link Referral Anda:</p>
         <input type="text" id="dashLinkRef" readonly style="background: #fff; margin-top: 5px; font-size: 11px;">
@@ -328,9 +327,6 @@
   </div>
 </div>
 
-<!-- Canvas tersembunyi untuk menghasilkan gambar struk -->
-<canvas id="receiptCanvas" width="600" height="800" style="display:none;"></canvas>
-
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwP-YqAviVJd0eiAFExDtLXODhdrwPQ1qQbZxnNCcW0OxU7LZM7UI4DoND6V5N1Ap6TBw/exec";
 
@@ -357,22 +353,13 @@ window.onload = function() {
     localStorage.setItem('aff_komisi_' + refCode, komisi + 15000);
 
     let invoices = JSON.parse(localStorage.getItem('aff_invoices_' + refCode)) || [];
-    let newInv = generateInvoice();
-    invoices.push(newInv);
+    invoices.push(generateInvoice());
     localStorage.setItem('aff_invoices_' + refCode, JSON.stringify(invoices));
-
-    // Simulasi Notifikasi Terjadi Penjualan ke nomor HP Affiliate
-    triggerAffiliateSaleNotification(refCode, newInv);
   }
   
   checkLoginStatus();
   startTimer();
 };
-
-function triggerAffiliateSaleNotification(refCode, invoiceNo) {
-  // Mencari apakah nomor HP affiliate tersimpan di LocalStorage atau memberi tahu via konsol/simulasi alert
-  console.log(`[NOTIFIKASI WHATSAPP KE AFFILIATE ${refCode}] Hore! Terjadi penjualan baru dengan No Invoice: ${invoiceNo}. Komisi Rp 15.000 telah ditambahkan.`);
-}
 
 var timerInterval;
 function startTimer() {
@@ -411,104 +398,34 @@ function closeOverlay() {
   document.getElementById("paymentModal").style.display = "none";
 }
 
-function generateReceiptCanvas(callback) {
-  const canvas = document.getElementById("receiptCanvas");
-  const ctx = canvas.getContext("2d");
-
-  // Background Putih
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Border & Header Struk
-  ctx.fillStyle = "#0056b3";
-  ctx.fillRect(0, 0, canvas.width, 100);
-
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 26px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("INVOICE PEMBAYARAN DIFAZA", canvas.width / 2, 45);
-
-  ctx.font = "14px sans-serif";
-  ctx.fillText("Aplikasi Kasir Profesional & Handal", canvas.width / 2, 75);
-
-  // Data Struk
-  ctx.fillStyle = "#333333";
-  ctx.textAlign = "left";
-  ctx.font = "16px sans-serif";
-
+function sendOrderWA() {
+  var adminWA = "62859109851554";
+  var namaAplikasi = "Aplikasi Kasir Diffaza";
   var noInvoice = generateInvoice();
+  
   var namaOwner = document.getElementById("namaOwner").value;
   var namaToko = document.getElementById("namaToko").value;
   var wa = document.getElementById("whatsapp").value;
   var email = document.getElementById("email").value;
   var alamatBisnis = document.getElementById("alamatBisnis").value;
   var kodeRef = document.getElementById("kodeReferalInput").value || "-";
-  var waktuTrans = new Date().toLocaleString();
 
-  let startY = 140;
-  let lineHeight = 30;
+  var message = "🧾 *INVOICE PEMESANAN: " + noInvoice + "*%0A" +
+                "=============================%0A" +
+                "📦 *Produk:* " + namaAplikasi + "%0A" +
+                "💰 *Nominal:* Rp 55.000 (Via QRIS)%0A" +
+                "🤝 *Kode Referal (DANA):* " + kodeRef + "%0A" +
+                "⏱️ *Batas Waktu:* 24 Jam%0A%0A" +
+                "*DATA PEMESAN:*%0A" +
+                "• Nama Owner: " + namaOwner + "%0A" +
+                "• Nama Toko: " + namaToko + "%0A" +
+                "• No. WA/HP: " + wa + "%0A" +
+                "• Email Pribadi: " + email + "%0A" +
+                "• Alamat Bisnis: " + alamatBisnis + "%0A%0A" +
+                "Halo Admin, saya telah melakukan pemesanan via QRIS. No Invoice saya: " + noInvoice;
 
-  ctx.fillText(`No Invoice    : ${noInvoice}`, 40, startY);
-  ctx.fillText(`Waktu         : ${waktuTrans}`, 40, startY + lineHeight);
-  ctx.fillText(`Produk        : Aplikasi Kasir Diffaza`, 40, startY + (lineHeight * 2));
-  ctx.fillText(`Nominal       : Rp 55.000 (Via QRIS)`, 40, startY + (lineHeight * 3));
-  ctx.fillText(`Kode Referal  : ${kodeRef}`, 40, startY + (lineHeight * 4));
-
-  // Garis Pembatas
-  ctx.strokeStyle = "#cccccc";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(40, startY + (lineHeight * 5));
-  ctx.lineTo(560, startY + (lineHeight * 5));
-  ctx.stroke();
-
-  // Data Pemesan
-  ctx.font = "bold 18px sans-serif";
-  ctx.fillStyle = "#0056b3";
-  ctx.fillText("DATA PEMESAN USAHA:", 40, startY + (lineHeight * 6));
-
-  ctx.font = "16px sans-serif";
-  ctx.fillStyle = "#333333";
-  ctx.fillText(`• Nama Owner  : ${namaOwner}`, 40, startY + (lineHeight * 7));
-  ctx.fillText(`• Nama Toko   : ${namaToko}`, 40, startY + (lineHeight * 8));
-  ctx.fillText(`• No. WA/HP   : ${wa}`, 40, startY + (lineHeight * 9));
-  ctx.fillText(`• Email       : ${email}`, 40, startY + (lineHeight * 10));
-  ctx.fillText(`• Alamat      : ${alamatBisnis}`, 40, startY + (lineHeight * 11));
-
-  // Footer Struk
-  ctx.fillStyle = "#28a745";
-  ctx.font = "bold 16px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("STATUS: MENUNGGU KONFIRMASI / BUKTI TRANSFER", canvas.width / 2, startY + (lineHeight * 13));
-
-  canvas.toBlob(function(blob) {
-    callback(blob, noInvoice);
-  }, "image/png");
-}
-
-function sendOrderWA() {
-  var adminWA = "62859109851554";
-  
-  generateReceiptCanvas(function(blob, noInvoice) {
-    // Karena pembatasan browser dalam mengirim file otomatis ke WhatsApp API secara langsung tanpa klik manual,
-    // kita sediakan link teks keterangan dan mengarahkan user untuk melampirkan gambar canvas struk yang dihasilkan.
-    var namaOwner = document.getElementById("namaOwner").value;
-    var message = `🧾 *KONFIRMASI PEMBAYARAN QRIS*%0A• No Invoice: ${noInvoice}%0A• Nama Owner: ${namaOwner}%0AHalo Admin, saya telah melakukan pembayaran via QRIS dan melampirkan struk digital. Mohon segera diproses.`;
-
-    var waUrl = "https://wa.me/" + adminWA + "?text=" + message;
-    
-    // Unduh otomatis gambar struk ke perangkat user agar mudah dilampirkan ke WhatsApp Admin
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Struk-Diffaza-${noInvoice}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    alert("Struk berhasil dibuat & diunduh otomatis! Silakan kirimkan file gambar struk tersebut ke WhatsApp Admin.");
-    window.open(waUrl, '_blank');
-  });
+  var waUrl = "https://wa.me/" + adminWA + "?text=" + message;
+  window.open(waUrl, '_blank');
 }
 
 function openAuthModal() { document.getElementById("authModal").style.display = "flex"; }
@@ -609,7 +526,6 @@ function checkLoginStatus() {
 
     document.getElementById("dashNama").innerText = loggedUser.nama;
     document.getElementById("dashEmail").innerText = loggedUser.email || "-";
-    document.getElementById("dashNoHp").innerText = loggedUser.noHp || "-";
     document.getElementById("dashDana").innerText = loggedUser.noDana;
 
     let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
@@ -660,10 +576,8 @@ function tarikKomisi() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   }).then(() => {
-    // Fungsi tombol diubah menjadi Save (tidak kirim ke WhatsApp, tetapi memunculkan alert komisi diterima < 24 jam)
-    alert("Data penarikan berhasil disimpan! Komisi Anda akan diterima dalam waktu kurang dari 24 jam.");
+    alert("Penarikan saldo berhasil! Komisi 50% akan diterima <24 jam.");
     
-    // Reset data ke 0 / kosong setelah penarikan global disimpan
     localStorage.setItem('aff_komisi_' + loggedUser.noDana, 0);
     localStorage.setItem('aff_leads_' + loggedUser.noDana, 0);
     localStorage.setItem('aff_invoices_' + loggedUser.noDana, JSON.stringify([]));
