@@ -328,7 +328,6 @@
   </div>
 </div>
 
-<!-- Canvas tersembunyi untuk menghasilkan gambar struk -->
 <canvas id="receiptCanvas" width="600" height="800" style="display:none;"></canvas>
 
 <script>
@@ -353,7 +352,6 @@ window.onload = function() {
     let leads = Number(localStorage.getItem('aff_leads_' + refCode)) || 0;
     localStorage.setItem('aff_leads_' + refCode, leads + 1);
 
-    // Komisi 50% dari total harga Rp 55.000 = Rp 27.500
     let komisi = Number(localStorage.getItem('aff_komisi_' + refCode)) || 0;
     localStorage.setItem('aff_komisi_' + refCode, komisi + 27500);
 
@@ -362,7 +360,6 @@ window.onload = function() {
     invoices.push(newInv);
     localStorage.setItem('aff_invoices_' + refCode, JSON.stringify(invoices));
 
-    // Simulasi Pengiriman Notifikasi ke WhatsApp Affiliator
     triggerAffiliateSaleNotification(refCode, newInv);
   }
   
@@ -481,7 +478,6 @@ function generateReceiptCanvas(callback) {
 }
 
 function sendOrderWA() {
-  // Nomor Admin yang baru
   var adminWA = "6283185706741";
   var pembeliWA = document.getElementById("whatsapp").value;
   
@@ -489,8 +485,7 @@ function sendOrderWA() {
     var namaOwner = document.getElementById("namaOwner").value;
     var namaToko = document.getElementById("namaToko").value;
     
-    // Pesan ke Admin dengan menyertakan nomor pembeli
-    var message = `🧾 *STRUK PEMESANAN MASUK (Seditkit)*%0A` +
+    var message = `🧾 *STRUK PEMESANAN MASUK*%0A` +
                   `• No Invoice: ${noInvoice}%0A` +
                   `• Nama Owner: ${namaOwner}%0A` +
                   `• Nama Toko: ${namaToko}%0A` +
@@ -613,6 +608,7 @@ function checkLoginStatus() {
     document.getElementById("dashNoHp").innerText = loggedUser.noHp || "-";
     document.getElementById("dashDana").innerText = loggedUser.noDana;
 
+    // Default komisi dan leads dipastikan 0 jika belum ada di localStorage
     let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
     let currentLeads = Number(localStorage.getItem('aff_leads_' + loggedUser.noDana)) || 0;
     let currentInvoices = JSON.parse(localStorage.getItem('aff_invoices_' + loggedUser.noDana)) || [];
@@ -663,6 +659,7 @@ function tarikKomisi() {
   }).then(() => {
     alert("Data penarikan berhasil disimpan! Komisi Anda akan diterima dalam waktu kurang dari 24 jam.");
     
+    // Reset kembali ke 0 setelah penarikan disimpan
     localStorage.setItem('aff_komisi_' + loggedUser.noDana, 0);
     localStorage.setItem('aff_leads_' + loggedUser.noDana, 0);
     localStorage.setItem('aff_invoices_' + loggedUser.noDana, JSON.stringify([]));
