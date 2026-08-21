@@ -169,7 +169,7 @@
 <body>
 
 <div class="form-container">
-  <!-- BAGIAN ATAS (TETEP TERLIHAT NORMAL) -->
+  <!-- BAGIAN ATAS -->
   <div class="aff-top-bar" id="userTopBar">
     <div>👤 <b>Tamu</b></div>
     <div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>
@@ -180,17 +180,15 @@
     <p>Harga Promo: Rp 100.000</p>
   </div>
   
-  <!-- BAGIAN FORM PEMESANAN (DIBURAMKAN JIKA BELUM ADA AKSES) -->
+  <!-- BAGIAN FORM PEMESANAN -->
   <div class="form-locked-wrapper">
     
-    <!-- Banner Pemberitahuan di Tengah Form yang Buram -->
     <div id="lockBanner" class="lock-banner">
       <h3 style="margin:0 0 8px; color:#0056b3; font-size:16px;">🔒 Form Terkunci</h3>
       <p style="margin:0 0 12px; font-size:12px; color:#555;">Gunakan link referal atau login/daftar affiliate terlebih dahulu untuk membuka formulir ini.</p>
       <button type="button" class="btn-custom" onclick="openAuthModal()" style="margin-top:0; padding:8px; font-size:13px;">Login / Daftar Sekarang</button>
     </div>
 
-    <!-- Elemen Form -->
     <form id="orderForm" class="form-blur-overlay" onsubmit="openOverlay(event)">
       <div class="form-group">
         <label>Nama Owner</label>
@@ -327,7 +325,7 @@
       </div>
 
       <div class="form-group">
-        <label>keterangan(Opsional)</label>
+        <label>Keterangan (Opsional)</label>
         <input type="text" id="buktiPenarikan" placeholder="Sesuatu yang dianggap penting untuk disampaikan">
       </div>
 
@@ -384,7 +382,6 @@ window.onload = function() {
   const refCode = urlParams.get('ref');
   
   if (refCode) {
-    // HANYA MENGISI FORM KODE REFERAL SECARA OTOMATIS (TIDAK MENAMBAH KOMISI OTOMATIS LAGI)
     document.getElementById('kodeReferalInput').value = refCode;
   }
   
@@ -441,7 +438,7 @@ function sendOrderWA() {
   var alamatBisnis = document.getElementById("alamatBisnis").value;
   var kodeRef = document.getElementById("kodeReferalInput").value;
 
-  // KOMISI DAN LEAD HANYA AKAN BERTAMBAH DISINI KETIKA PEMBELI BENAR-BENAR MENGIRIM PESANAN
+  // Pencatatan komisi & lead spesifik berdasarkan No DANA Affiliate
   if (kodeRef) {
     let leads = Number(localStorage.getItem('aff_leads_' + kodeRef)) || 0;
     localStorage.setItem('aff_leads_' + kodeRef, leads + 1);
@@ -585,7 +582,6 @@ function checkLoginStatus() {
     document.getElementById("dashEmail").innerText = loggedUser.email || "-";
     document.getElementById("dashDana").innerText = loggedUser.noDana;
 
-    // AMBIL DATA BERDASARKAN NO DANA USER (DEFAULT AKAN 0 JIKA BELUM ADA TRANSAKSI)
     let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
     let currentLeads = Number(localStorage.getItem('aff_leads_' + loggedUser.noDana)) || 0;
     let currentInvoices = JSON.parse(localStorage.getItem('aff_invoices_' + loggedUser.noDana)) || [];
@@ -606,10 +602,15 @@ function checkLoginStatus() {
 
 function tarikKomisi() {
   let loggedUser = JSON.parse(localStorage.getItem('aff_logged_in'));
+  if(!loggedUser) {
+    alert("Silakan login terlebih dahulu.");
+    return;
+  }
+
   let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
   let currentInvoices = JSON.parse(localStorage.getItem('aff_invoices_' + loggedUser.noDana)) || [];
 
-  if(!loggedUser || currentKomisi <= 0 || currentInvoices.length === 0) {
+  if(currentKomisi <= 0 || currentInvoices.length === 0) {
     alert("Sisa komisi atau data invoice pembelian masih kosong (0).");
     return;
   }
@@ -636,6 +637,7 @@ function tarikKomisi() {
   }).then(() => {
     alert("Penarikan saldo berhasil! Komisi akan segera diproses.");
     
+    // Reset data lokal setelah penarikan berhasil diajukan
     localStorage.setItem('aff_komisi_' + loggedUser.noDana, 0);
     localStorage.setItem('aff_leads_' + loggedUser.noDana, 0);
     localStorage.setItem('aff_invoices_' + loggedUser.noDana, JSON.stringify([]));
