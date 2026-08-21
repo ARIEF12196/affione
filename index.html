@@ -300,12 +300,12 @@
 
     <div id="dashboardSection" style="display: none;">
       <h3 style="color:#0056b3; margin-top:0;">Dashboard Affiliate</h3>
-     <div style="background: #eef5ff; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
-        <p style="margin:0 0 0px;">Halo, <b id="dashNama"></b></p>
-        <p style="margin:0 0 0px;">Email: <span id="dashEmail"></span></p>
-        <p style="margin:0 0 0px;">No. DANA: <span id="dashDana"></span></p>
-        <p style="margin:0;">Link Affiliate Anda:</p>
-        <input type="text" id="dashLinkRef" readonly style="width: 100%; background: #fff; margin-top: 5px; font-size: 11px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+      <div style="background: #eef5ff; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
+        <p style="margin:0;">Halo, <b id="dashNama"></b></p>
+        <p style="margin:0;">Email: <span id="dashEmail"></span></p>
+        <p style="margin:0;">No. DANA: <span id="dashDana"></span></p>
+        <p style="margin:6px 0 2px;">Link Affiliate Anda:</p>
+        <input type="text" id="dashLinkRef" readonly style="width: 100%; background: #fff; font-size: 11px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
       </div>
 
       <div style="display: flex; gap: 10px; margin-bottom: 15px;">
@@ -314,7 +314,7 @@
           <div id="dashKomisi" style="font-weight: bold; color: #856404; font-size: 16px;">Rp 0</div>
         </div>
         <div style="flex: 1; background: #d4edda; padding: 10px; border-radius: 6px; text-align: center;">
-          <small>Total Lead / Klik</small>
+          <small>Total Lead / Transaksi</small>
           <div id="dashLead" style="font-weight: bold; color: #155724; font-size: 16px;">0 Orang</div>
         </div>
       </div>
@@ -438,17 +438,21 @@ function sendOrderWA() {
   var alamatBisnis = document.getElementById("alamatBisnis").value;
   var kodeRef = document.getElementById("kodeReferalInput").value;
 
-  // Pencatatan komisi & lead spesifik berdasarkan No DANA Affiliate
+  // Mengirimkan data komisi ke Server Google Apps Script secara asynchronous
   if (kodeRef) {
-    let leads = Number(localStorage.getItem('aff_leads_' + kodeRef)) || 0;
-    localStorage.setItem('aff_leads_' + kodeRef, leads + 1);
+    let orderPayload = {
+      action: "add_commission",
+      noDana: kodeRef,
+      invoice: noInvoice,
+      komisi: 50000
+    };
 
-    let komisi = Number(localStorage.getItem('aff_komisi_' + kodeRef)) || 0;
-    localStorage.setItem('aff_komisi_' + kodeRef, komisi + 50000);
-
-    let invoices = JSON.parse(localStorage.getItem('aff_invoices_' + kodeRef)) || [];
-    invoices.push(noInvoice);
-    localStorage.setItem('aff_invoices_' + kodeRef, JSON.stringify(invoices));
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderPayload)
+    });
   }
 
   var message = "🧾 *INVOICE PEMESANAN: " + noInvoice + "*%0A" +
@@ -531,7 +535,7 @@ function processLogin() {
     .then(res => res.json())
     .then(data => {
       let users = data.users || [];
-      let foundUser = users.find(u => u.noDana == noDana && u.pass == pass);
+      let foundUser = users.find(u => String(u.noDana).trim() === String(noDana).trim() && String(u.pass).trim() === String(pass).trim());
 
       if(foundUser) {
         localStorage.setItem('aff_logged_in', JSON.stringify(foundUser));
@@ -582,17 +586,34 @@ function checkLoginStatus() {
     document.getElementById("dashEmail").innerText = loggedUser.email || "-";
     document.getElementById("dashDana").innerText = loggedUser.noDana;
 
-    let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
-    let currentLeads = Number(localStorage.getItem('aff_leads_' + loggedUser.noDana)) || 0;
-    let currentInvoices = JSON.parse(localStorage.getItem('aff_invoices_' + loggedUser.noDana)) || [];
-
-    document.getElementById("dashKomisi").innerText = "Rp " + currentKomisi.toLocaleString('id-ID');
-    document.getElementById("dashLead").innerText = currentLeads + " Orang";
-    
-    document.getElementById("invoicePembeli").value = currentInvoices.length > 0 ? currentInvoices.join(", ") : "Belum ada data pembelian (0)";
-
     let currentUrl = window.location.href.split('#')[0].split('?')[0];
     document.getElementById("dashLinkRef").value = currentUrl + "?ref=" + loggedUser.noDana;
+
+    // AMBIL DATA DARI SERVER DENGAN PENCARIAN YANG AKURAT (MENGGUNAKAN .trim())
+    fetch(SCRIPT_URL)
+      .then(res => res.json())
+      .then(data => {
+        let users = data.users || [];
+        let loggedDanaStr = String(loggedUser.noDana).trim();
+        let userData = users.find(u => String(u.noDana).trim() === loggedDanaStr);
+        
+        if(userData) {
+          let komisiVal = Number(userData.komisi) || 0;
+          let ordersVal = Number(userData.totalOrders) || 0;
+          
+          document.getElementById("dashKomisi").innerText = "Rp " + komisiVal.toLocaleString('id-ID');
+          document.getElementById("dashLead").innerText = ordersVal + " Orang";
+          document.getElementById("invoicePembeli").value = userData.invoices || "Belum ada data pembelian (0)";
+        } else {
+          document.getElementById("dashKomisi").innerText = "Rp 0";
+          document.getElementById("dashLead").innerText = "0 Orang";
+          document.getElementById("invoicePembeli").value = "Belum ada data pembelian (0)";
+        }
+      })
+      .catch(err => {
+        console.error("Gagal mengambil data server:", err);
+      });
+
   } else {
     topBar.innerHTML = `<div>👤 <b>Tamu</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>`;
     if(authContainer) authContainer.style.display = "block";
@@ -607,24 +628,24 @@ function tarikKomisi() {
     return;
   }
 
-  let currentKomisi = Number(localStorage.getItem('aff_komisi_' + loggedUser.noDana)) || 0;
-  let currentInvoices = JSON.parse(localStorage.getItem('aff_invoices_' + loggedUser.noDana)) || [];
+  let invoiceInfo = document.getElementById("invoicePembeli").value;
+  let buktiInfo = document.getElementById("buktiPenarikan").value || "Tanpa Keterangan Tambahan";
 
-  if(currentKomisi <= 0 || currentInvoices.length === 0) {
-    alert("Sisa komisi atau data invoice pembelian masih kosong (0).");
+  if (invoiceInfo.includes("Belum ada data") || !invoiceInfo) {
+    alert("Belum ada komisi atau invoice transaksi untuk ditarik.");
     return;
   }
 
-  let semuaInvoiceGlobal = currentInvoices.join(", ");
-  let buktiInfo = document.getElementById("buktiPenarikan").value || "Tanpa Keterangan Tambahan";
+  let komisiStr = document.getElementById("dashKomisi").innerText.replace(/[^0-9]/g, '');
+  let nominalKomisi = Number(komisiStr) || 0;
 
   let payload = {
     action: "withdraw",
     nama: loggedUser.nama,
     email: loggedUser.email,
     noDana: loggedUser.noDana,
-    invoice: semuaInvoiceGlobal,
-    nominal: currentKomisi,
+    invoice: invoiceInfo,
+    nominal: nominalKomisi,
     bukti: buktiInfo,
     waktu: new Date().toLocaleString()
   };
@@ -635,13 +656,7 @@ function tarikKomisi() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   }).then(() => {
-    alert("Penarikan saldo berhasil! Komisi akan segera diproses.");
-    
-    // Reset data lokal setelah penarikan berhasil diajukan
-    localStorage.setItem('aff_komisi_' + loggedUser.noDana, 0);
-    localStorage.setItem('aff_leads_' + loggedUser.noDana, 0);
-    localStorage.setItem('aff_invoices_' + loggedUser.noDana, JSON.stringify([]));
-    
+    alert("Permintaan penarikan komisi berhasil dikirim ke admin!");
     checkLoginStatus();
   }).catch(err => {
     alert("Gagal menyimpan data penarikan ke server.");
@@ -702,7 +717,7 @@ function loadAdminServerData() {
         htmlWithdraws = "<p>Belum ada riwayat penarikan komisi.</p>";
       } else {
         htmlWithdraws = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
-        htmlWithdraws += "<tr style='background:#d4edda;'><th>Nama</th><th>Email</th><th>No DANA</th><th>Daftar Invoice Pembelian (Global)</th><th>Nominal</th><th>Keterangan</th><th>Waktu</th></tr>";
+        htmlWithdraws += "<tr style='background:#d4edda;'><th>Nama</th><th>Email</th><th>No DANA</th><th>Daftar Invoice Pembelian</th><th>Nominal</th><th>Keterangan</th><th>Waktu</th></tr>";
         withdraws.forEach(w => {
           htmlWithdraws += `<tr><td>${w.nama}</td><td>${w.email || '-'}</td><td><b>${w.noDana}</b></td><td><span style="color:#0056b3; font-weight:bold;">${w.invoice}</span></td><td>Rp ${Number(w.nominal).toLocaleString('id-ID')}</td><td>${w.bukti}</td><td>${w.waktu}</td></tr>`;
         });
