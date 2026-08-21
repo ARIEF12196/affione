@@ -336,8 +336,9 @@
   </div>
 </div>
 
+<!-- MODAL UTAMA ADMIN -->
 <div id="adminModal" class="modal-overlay">
-  <div class="modal-content" style="max-width: 650px; text-align: left; max-height: 90vh; overflow-y: auto;">
+  <div class="modal-content" style="max-width: 750px; text-align: left; max-height: 90vh; overflow-y: auto;">
     <span class="close-btn" onclick="closeAdminModal()">&times;</span>
     <h3 style="color: #0056b3; margin-top: 0;">🔒 Server Dashboard Admin</h3>
     
@@ -351,17 +352,29 @@
 
     <div id="adminDataDashboard" style="display: none;">
       <h4 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #333;">📋 Database Daftar Affiliate (Online Sheets)</h4>
-      <div id="listAffiliateServer" style="font-size: 12px; margin-bottom: 20px; max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
+      <div id="listAffiliateServer" style="font-size: 12px; margin-bottom: 20px; max-height: 180px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
         Memuat data dari server...
       </div>
 
       <h4 style="border-bottom: 2px solid #28a745; padding-bottom: 5px; color: #333;">💸 Riwayat & Bukti Permintaan Tarik Komisi</h4>
-      <div id="listPenarikanServer" style="font-size: 12px; margin-bottom: 15px; max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
+      <div id="listPenarikanServer" style="font-size: 12px; margin-bottom: 15px; max-height: 180px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
         Memuat data dari server...
       </div>
 
       <button type="button" class="btn-custom" onclick="lockAdmin()" style="background-color: #6c757d;">Kunci Kembali Admin</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL BARU: POP-UP DETAIL DATA UNTUK JENDELA BESAR -->
+<div id="detailModal" class="modal-overlay">
+  <div class="modal-content" style="max-width: 500px; text-align: left;">
+    <span class="close-btn" onclick="closeDetailModal()">&times;</span>
+    <h3 style="color: #0056b3; margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 8px;">🔍 Detail Data Terpilih</h3>
+    <div id="detailModalBody" style="font-size: 14px; line-height: 1.6; color: #333; margin: 15px 0;">
+      <!-- Isi rincian data akan masuk otomatis di sini -->
+    </div>
+    <button type="button" class="btn-custom" onclick="closeDetailModal()">Tutup</button>
   </div>
 </div>
 
@@ -438,7 +451,6 @@ function sendOrderWA() {
   var alamatBisnis = document.getElementById("alamatBisnis").value;
   var kodeRef = document.getElementById("kodeReferalInput").value;
 
-  // Mengirimkan data komisi ke Server Google Apps Script secara asynchronous
   if (kodeRef) {
     let orderPayload = {
       action: "add_commission",
@@ -589,7 +601,6 @@ function checkLoginStatus() {
     let currentUrl = window.location.href.split('#')[0].split('?')[0];
     document.getElementById("dashLinkRef").value = currentUrl + "?ref=" + loggedUser.noDana;
 
-    // AMBIL DATA DARI SERVER DENGAN PENCARIAN YANG AKURAT (MENGGUNAKAN .trim())
     fetch(SCRIPT_URL)
       .then(res => res.json())
       .then(data => {
@@ -690,6 +701,41 @@ function lockAdmin() {
   closeAdminModal();
 }
 
+// FUNGSI UNTUK MEMBUKA POP-UP JENDELA BESAR KETIKA DIKLIK
+function showAffiliateDetail(nama, email, noHp, noDana, pass, komisi, totalOrders, invoices, tanggal) {
+  let html = `
+    <p><b>Nama:</b> ${nama}</p>
+    <p><b>Email:</b> ${email || '-'}</p>
+    <p><b>No HP:</b> ${noHp}</p>
+    <p><b>No DANA / Referal:</b> ${noDana}</p>
+    <p><b>Password Akun:</b> ${pass}</p>
+    <p><b>Total Komisi:</b> Rp ${(Number(komisi)||0).toLocaleString('id-ID')}</p>
+    <p><b>Total Pesanan/Order:</b> ${totalOrders} Orang</p>
+    <p><b>Daftar Invoices:</b><br><span style="color:#0056b3; word-break:break-all;">${invoices || 'Belum ada'}</span></p>
+    <p><b>Tanggal Daftar:</b> ${tanggal || '-'}</p>
+  `;
+  document.getElementById("detailModalBody").innerHTML = html;
+  document.getElementById("detailModal").style.display = "flex";
+}
+
+function showWithdrawDetail(nama, email, noDana, invoice, nominal, bukti, waktu) {
+  let html = `
+    <p><b>Nama Affiliate:</b> ${nama}</p>
+    <p><b>Email:</b> ${email || '-'}</p>
+    <p><b>No DANA Tujuan:</b> ${noDana}</p>
+    <p><b>Nominal Penarikan:</b> Rp ${Number(nominal).toLocaleString('id-ID')}</p>
+    <p><b>Daftar Invoice Pembelian:</b><br><span style="color:#0056b3; word-break:break-all;">${invoice}</span></p>
+    <p><b>Keterangan:</b> ${bukti}</p>
+    <p><b>Waktu Permintaan:</b> ${waktu}</p>
+  `;
+  document.getElementById("detailModalBody").innerHTML = html;
+  document.getElementById("detailModal").style.display = "flex";
+}
+
+function closeDetailModal() {
+  document.getElementById("detailModal").style.display = "none";
+}
+
 function loadAdminServerData() {
   document.getElementById("listAffiliateServer").innerHTML = "Memuat data dari Google Sheets...";
   document.getElementById("listPenarikanServer").innerHTML = "Memuat data dari Google Sheets...";
@@ -703,9 +749,20 @@ function loadAdminServerData() {
         htmlUsers = "<p>Belum ada afiliasi yang mendaftar.</p>";
       } else {
         htmlUsers = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
-        htmlUsers += "<tr style='background:#eef5ff;'><th>Nama</th><th>Email</th><th>No HP</th><th>No DANA</th><th>Komisi</th><th>Tanggal</th></tr>";
+        htmlUsers += "<tr style='background:#eef5ff;'><th>Nama</th><th>No DANA</th><th>Komisi</th><th>Aksi</th></tr>";
         users.forEach(u => {
-          htmlUsers += `<tr><td>${u.nama}</td><td>${u.email || '-'}</td><td>${u.noHp}</td><td><b>${u.noDana}</b></td><td>Rp ${(Number(u.komisi)||0).toLocaleString('id-ID')}</td><td>${u.tanggal || '-'}</td></tr>`;
+          // Escape parameter string untuk menghindari error tanda kutip
+          let uNama = (u.nama || '').replace(/'/g, "\\'");
+          let uEmail = (u.email || '').replace(/'/g, "\\'");
+          let uInvoices = (u.invoices || '').replace(/'/g, "\\'");
+          let uTanggal = (u.tanggal || '').replace(/'/g, "\\'");
+
+          htmlUsers += `<tr>
+            <td>${u.nama}</td>
+            <td><b>${u.noDana}</b></td>
+            <td>Rp ${(Number(u.komisi)||0).toLocaleString('id-ID')}</td>
+            <td align="center"><button type="button" onclick="showAffiliateDetail('${uNama}', '${uEmail}', '${u.noHp}', '${u.noDana}', '${u.pass}', '${u.komisi}', '${u.totalOrders}', '${uInvoices}', '${uTanggal}')" style="background:#0056b3; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">🔍 Detail</button></td>
+          </tr>`;
         });
         htmlUsers += "</table>";
       }
@@ -717,9 +774,20 @@ function loadAdminServerData() {
         htmlWithdraws = "<p>Belum ada riwayat penarikan komisi.</p>";
       } else {
         htmlWithdraws = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
-        htmlWithdraws += "<tr style='background:#d4edda;'><th>Nama</th><th>Email</th><th>No DANA</th><th>Daftar Invoice Pembelian</th><th>Nominal</th><th>Keterangan</th><th>Waktu</th></tr>";
+        htmlWithdraws += "<tr style='background:#d4edda;'><th>Nama</th><th>No DANA</th><th>Nominal</th><th>Aksi</th></tr>";
         withdraws.forEach(w => {
-          htmlWithdraws += `<tr><td>${w.nama}</td><td>${w.email || '-'}</td><td><b>${w.noDana}</b></td><td><span style="color:#0056b3; font-weight:bold;">${w.invoice}</span></td><td>Rp ${Number(w.nominal).toLocaleString('id-ID')}</td><td>${w.bukti}</td><td>${w.waktu}</td></tr>`;
+          let wNama = (w.nama || '').replace(/'/g, "\\'");
+          let wEmail = (w.email || '').replace(/'/g, "\\'");
+          let wInvoice = (w.invoice || '').replace(/'/g, "\\'");
+          let wBukti = (w.bukti || '').replace(/'/g, "\\'");
+          let wWaktu = (w.waktu || '').replace(/'/g, "\\'");
+
+          htmlWithdraws += `<tr>
+            <td>${w.nama}</td>
+            <td><b>${w.noDana}</b></td>
+            <td>Rp ${Number(w.nominal).toLocaleString('id-ID')}</td>
+            <td align="center"><button type="button" onclick="showWithdrawDetail('${wNama}', '${wEmail}', '${w.noDana}', '${wInvoice}', '${w.nominal}', '${wBukti}', '${wWaktu}')" style="background:#28a745; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">🔍 Detail</button></td>
+          </tr>`;
         });
         htmlWithdraws += "</table>";
       }
