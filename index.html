@@ -43,7 +43,7 @@
     box-shadow: 0 0 5px rgba(0, 86, 179, 0.3);
   }
 
-  .btn-next, .btn-submit, .btn-custom, .btn-trial {
+  .btn-next, .btn-submit, .btn-custom, .btn-trial, .btn-direct-pay {
     width: 100%;
     background-color: #0056b3;
     color: white;
@@ -61,8 +61,12 @@
   .btn-submit:hover { background-color: #218838; }
   
   /* Tombol Khusus Trial warna Oranye/Amber */
-  .btn-trial { background-color: #fd7e14; margin-bottom: 10px; }
+  .btn-trial { background-color: #fd7e14; margin-bottom: 6px; }
   .btn-trial:hover { background-color: #e86902; }
+
+  /* Tombol Pembayaran Langsung warna Hijau Terang */
+  .btn-direct-pay { background-color: #28a745; margin-bottom: 15px; }
+  .btn-direct-pay:hover { background-color: #218838; }
 
   .aff-top-bar {
     display: flex;
@@ -185,6 +189,9 @@
   
   <!-- TOMBOL TRIAL OTOMATIS MEMBAWA LINK REFERAL -->
   <button type="button" class="btn-trial" onclick="goToTrial()">🎁 Coba Versi Trial Gratis Dulu</button>
+  
+  <!-- TOMBOL PEMBAYARAN LANGSUNG MENGARAH KE LINK TUJUAN DENGAN REFERAL -->
+  <button type="button" class="btn-direct-pay" onclick="goToDirectPay()">💳 Pesan & Bayar Sekarang</button>
 
   <!-- BAGIAN FORM PEMESANAN -->
   <div class="form-locked-wrapper">
@@ -395,11 +402,30 @@ function goToTrial() {
   var refCode = urlParams.get('ref');
 
   if (refCode) {
-    // Jika pengunjung datang dari link afiliasi, teruskan parameter ?ref=... ke halaman trial
     window.location.href = trialBaseUrl + "?ref=" + refCode;
   } else {
-    // Jika tidak ada referal, langsung buka link trial biasa
     window.location.href = trialBaseUrl;
+  }
+}
+
+// FUNGSI UNTUK MENGARAHKAN KE HALAMAN PEMBAYARAN MENGGUNAKAN LINK TUJUAN & REFERAL AKTIF
+function goToDirectPay() {
+  var payBaseUrl = "https://arief12196.github.io/affione/";
+  var urlParams = new URLSearchParams(window.location.search);
+  var refCode = urlParams.get('ref');
+
+  // Jika tidak ada di URL, cek apakah user yang login sedang membuka dashboard dengan referal sendiri
+  if (!refCode) {
+    let loggedUser = JSON.parse(localStorage.getItem('aff_logged_in'));
+    if (loggedUser && loggedUser.noDana) {
+      refCode = loggedUser.noDana;
+    }
+  }
+
+  if (refCode) {
+    window.location.href = payBaseUrl + "?ref=" + refCode;
+  } else {
+    window.location.href = payBaseUrl;
   }
 }
 
