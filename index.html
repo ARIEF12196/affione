@@ -43,7 +43,7 @@
     box-shadow: 0 0 5px rgba(0, 86, 179, 0.3);
   }
 
-  .btn-next, .btn-submit, .btn-custom, .btn-trial, .btn-pay-now {
+  .btn-next, .btn-submit, .btn-custom, .btn-trial {
     width: 100%;
     background-color: #0056b3;
     color: white;
@@ -56,17 +56,13 @@
     margin-top: 10px;
     transition: background 0.3s ease;
   }
-  .btn-next:hover, .btn-custom:hover { background-color: #4085; }
+  .btn-next:hover, .btn-custom:hover { background-color: #004085; }
   .btn-submit { background-color: #28a745; }
   .btn-submit:hover { background-color: #218838; }
  
   /* Tombol Khusus Trial warna Oranye/Amber */
   .btn-trial { background-color: #fd7e14; margin-bottom: 10px; }
   .btn-trial:hover { background-color: #e86902; }
-
-  /* Tombol Khusus Bayar Sekarang warna Hijau Terang */
-  .btn-pay-now { background-color: #20c997; margin-bottom: 10px; }
-  .btn-pay-now:hover { background-color: #17a589; }
 
   .aff-top-bar {
     display: flex;
@@ -178,7 +174,7 @@
 <div class="form-container">
   <!-- BAGIAN ATAS -->
   <div class="aff-top-bar" id="userTopBar">
-    <div> <b>Tamu</b></div>
+    <div><b>Tamu</b></div>
     <div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>
   </div>
 
@@ -188,16 +184,13 @@
   </div>
  
   <!-- TOMBOL TRIAL OTOMATIS MEMBAWA LINK REFERAL -->
-  <button type="button" class="btn-trial" onclick="goToTrial()"> 🚀 Coba Versi Trial Gratis Dulu</button>
+  <button type="button" class="btn-trial" onclick="goToTrial()">🚀 Coba Versi Trial Gratis Dulu</button>
   
-  <!-- TOMBOL BAYAR SEKARANG LANGSUNG MEMBAWA LINK REFERAL -->
-  <button type="button" class="btn-pay-now" onclick="goToPayNow()"> 💳 Bayar Sekarang (Gunakan Link Afiliasi)</button>
-
   <!-- BAGIAN FORM PEMESANAN -->
   <div class="form-locked-wrapper">
    
     <div id="lockBanner" class="lock-banner">
-      <h3 style="margin:0 0 8px; color:#0056b3; font-size:16px;"> 🔒 MASUK/DAFTAR</h3>
+      <h3 style="margin:0 0 8px; color:#0056b3; font-size:16px;">🔒 MASUK/DAFTAR</h3>
       <p style="margin:0 0 12px; font-size:12px; color:#555;">Gunakan link referal atau login/daftar affiliate terlebih dahulu untuk membuka formulir ini.</p>
       <button type="button" class="btn-custom" onclick="openAuthModal()" style="margin-top:0; padding:8px; font-size:13px;">Login / Daftar Sekarang</button>
     </div>
@@ -233,14 +226,14 @@
         <input type="text" id="kodeReferalInput" placeholder="Otomatis terisi jika dari link affiliate" readonly style="background-color: #e9ecef;">
       </div>
 
-      <button type="submit" class="btn-next"> 📲 LANJUT KE PEMBAYARAN </button>
+      <button type="submit" class="btn-next">📲 LANJUT KE PEMBAYARAN</button>
     </form>
 
   </div>
 </div>
 
 <div class="admin-trigger">
-  <a href="#" onclick="openAdminLogin(event)"> ⚙️ Panel Khusus Admin Server</a>
+  <a href="#" onclick="openAdminLogin(event)">⚙️ Panel Khusus Admin Server</a>
 </div>
 
 <div id="paymentModal" class="modal-overlay">
@@ -260,7 +253,7 @@
         <span id="countdown">23:59:59</span>
       </div>
     </div>
-    <button type="button" class="btn-submit" onclick="sendOrderWA()">Konfirmasi admin &  Kirim bukti transfer</button>
+    <button type="button" class="btn-submit" onclick="sendOrderWA()">Konfirmasi admin & Kirim bukti transfer</button>
   </div>
 </div>
 
@@ -344,7 +337,7 @@
         <input type="text" id="buktiPenarikan" placeholder="Sesuatu yang dianggap penting untuk disampaikan">
       </div>
 
-      <button type="button" class="btn-submit" onclick="tarikKomisi()" style="margin-bottom: 8px;"> 💸 TARIK KOMISI CEK EMAIL</button>
+      <button type="button" class="btn-submit" onclick="tarikKomisi()" style="margin-bottom: 8px;">💸 TARIK KOMISI CEK EMAIL</button>
       <button type="button" class="btn-custom" onclick="processLogout()" style="background-color: #dc3545;">Keluar (Logout)</button>
     </div>
 
@@ -355,7 +348,7 @@
 <div id="adminModal" class="modal-overlay">
   <div class="modal-content" style="max-width: 750px; text-align: left; max-height: 90vh; overflow-y: auto;">
     <span class="close-btn" onclick="closeAdminModal()">&times;</span>
-    <h3 style="color: #0056b3; margin-top: 0;"> ⚙️ Server Dashboard Admin</h3>
+    <h3 style="color: #0056b3; margin-top: 0;">⚙️ Server Dashboard Admin</h3>
    
     <div id="adminLoginForm">
       <p style="font-size: 13px; color: #666;">Masukkan password khusus admin:</p>
@@ -366,12 +359,12 @@
     </div>
 
     <div id="adminDataDashboard" style="display: none;">
-      <h4 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #333;"> 📋 Database Daftar Affiliate (Online Sheets)</h4>
+      <h4 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #333;">📋 Database Daftar Affiliate (Online Sheets)</h4>
       <div id="listAffiliateServer" style="font-size: 12px; margin-bottom: 20px; max-height: 180px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
         Memuat data dari server...
       </div>
 
-      <h4 style="border-bottom: 2px solid #28a745; padding-bottom: 5px; color: #333;"> 📜 Riwayat & Bukti Permintaan Tarik Komisi</h4>
+      <h4 style="border-bottom: 2px solid #28a745; padding-bottom: 5px; color: #333;">📜 Riwayat & Bukti Permintaan Tarik Komisi</h4>
       <div id="listPenarikanServer" style="font-size: 12px; margin-bottom: 15px; max-height: 180px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 6px;">
         Memuat data dari server...
       </div>
@@ -385,7 +378,7 @@
 <div id="detailModal" class="modal-overlay">
   <div class="modal-content" style="max-width: 500px; text-align: left;">
     <span class="close-btn" onclick="closeDetailModal()">&times;</span>
-    <h3 style="color: #0056b3; margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 8px;"> 📄 Detail Data Terpilih</h3>
+    <h3 style="color: #0056b3; margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 8px;">📄 Detail Data Terpilih</h3>
     <div id="detailModalBody" style="font-size: 14px; line-height: 1.6; color: #333; margin: 15px 0;">
     </div>
     <button type="button" class="btn-custom" onclick="closeDetailModal()">Tutup</button>
@@ -405,26 +398,6 @@ function goToTrial() {
     window.location.href = trialBaseUrl + "?ref=" + refCode;
   } else {
     window.location.href = trialBaseUrl;
-  }
-}
-
-// FUNGSI TOMBOL BAYAR SEKARANG (MEMBAWA LINK AFFILIATE JUGA JIKA TERSEDIA)
-function goToPayNow() {
-  var urlParams = new URLSearchParams(window.location.search);
-  var refCode = urlParams.get('ref');
-
-  // Jika form terkunci dan belum ada link affiliate, sarankan login/daftar terlebih dahulu
-  let loggedUser = JSON.parse(localStorage.getItem('aff_logged_in'));
-  if (!refCode && !loggedUser) {
-    alert("Silakan Login/Daftar Affiliate atau gunakan link referal terlebih dahulu untuk melanjutkan pembayaran.");
-    openAuthModal();
-    return;
-  }
-
-  // Gulir otomatis atau fokus ke form/tombol pembayaran jika form sudah terbuka
-  var orderFormSection = document.getElementById("orderForm");
-  if (orderFormSection) {
-    orderFormSection.scrollIntoView({ behavior: 'smooth' });
   }
 }
 
@@ -514,7 +487,7 @@ function sendOrderWA() {
     });
   }
 
-  var message = " 📦 *INVOICE PEMESANAN: " + noInvoice + "*%0A" +
+  var message = "📦 *INVOICE PEMESANAN: " + noInvoice + "*%0A" +
                 "=============================%0A" +
                 "*Produk:* " + namaAplikasi + "%0A" +
                 "*Nominal:* Rp 100.000 (Via QRIS)%0A" +
@@ -637,7 +610,7 @@ function checkLoginStatus() {
   }
 
   if(loggedUser) {
-    topBar.innerHTML = `<div> 👤 <b>${loggedUser.nama}</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Dashboard</a></div>`;
+    topBar.innerHTML = `<div>👤 <b>${loggedUser.nama}</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Dashboard</a></div>`;
     if(authContainer) authContainer.style.display = "none";
     if(dashboardSection) dashboardSection.style.display = "block";
 
@@ -673,7 +646,7 @@ function checkLoginStatus() {
       });
 
   } else {
-    topBar.innerHTML = `<div> 👤 <b>Tamu</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>`;
+    topBar.innerHTML = `<div>👤 <b>Tamu</b></div><div><a href="#" onclick="openAuthModal()" style="color:#0056b3; font-weight:bold; text-decoration:none;">Login / Daftar Affiliate</a></div>`;
     if(authContainer) authContainer.style.display = "block";
     if(dashboardSection) dashboardSection.style.display = "none";
   }
@@ -806,7 +779,7 @@ function loadAdminServerData() {
             <td>${u.nama}</td>
             <td><b>${u.noDana}</b></td>
             <td>Rp ${(Number(u.komisi)||0).toLocaleString('id-ID')}</td>
-            <td align="center"><button type="button" onclick="showAffiliateDetail('${uNama}', '${uEmail}', '${u.noHp}', '${u.noDana}', '${u.pass}', '${u.komisi}', '${u.totalOrders}', '${uInvoices}', '${uTanggal}')" style="background:#0056b3; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;"> 🔍 Detail</button></td>
+            <td align="center"><button type="button" onclick="showAffiliateDetail('${uNama}', '${uEmail}', '${u.noHp}', '${u.noDana}', '${u.pass}', '${u.komisi}', '${u.totalOrders}', '${uInvoices}', '${uTanggal}')" style="background:#0056b3; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">🔍 Detail</button></td>
           </tr>`;
         });
         htmlUsers += "</table>";
@@ -831,7 +804,7 @@ function loadAdminServerData() {
             <td>${w.nama}</td>
             <td><b>${w.noDana}</b></td>
             <td>Rp ${Number(w.nominal).toLocaleString('id-ID')}</td>
-            <td align="center"><button type="button" onclick="showWithdrawDetail('${wNama}', '${wEmail}', '${w.noDana}', '${wInvoice}', '${w.nominal}', '${wBukti}', '${wWaktu}')" style="background:#28a745; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;"> 🔍 Detail</button></td>
+            <td align="center"><button type="button" onclick="showWithdrawDetail('${wNama}', '${wEmail}', '${w.noDana}', '${wInvoice}', '${w.nominal}', '${wBukti}', '${wWaktu}')" style="background:#28a745; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">🔍 Detail</button></td>
           </tr>`;
         });
         htmlWithdraws += "</table>";
@@ -839,12 +812,11 @@ function loadAdminServerData() {
       document.getElementById("listPenarikanServer").innerHTML = htmlWithdraws;
     })
     .catch(err => {
-      document.getElementById("listAffiliateServer").innerHTML = "<p style='color:red;'>Gagal mengambil data dari server Google Sheets.</p>";
-      document.getElementById("listPenarikanServer").innerHTML = "<p style='color:red;'>Gagal mengambil data dari server Google Sheets.</p>";
+      document.getElementById("listAffiliateServer").innerHTML = "<p style='color:red;'>Gagal memuat data affiliate.</p>";
+      document.getElementById("listPenarikanServer").innerHTML = "<p style='color:red;'>Gagal memuat riwayat penarikan.</p>";
       console.error(err);
     });
 }
 </script>
-
 </body>
 </html>
