@@ -395,11 +395,25 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0hiNjoFxbaCwRMANwILVSMdtl84chsAF1OSFxA_3CgM2ZgdXtJrSmxqed7bHfBs4b2A/exec";
 
-// FUNGSI UNTUK MENGARAHKAN KE HALAMAN TRIAL DENGAN MEMBAWA KODE REFERAL (JIKA ADA)
-function goToTrial() {
-  var trialBaseUrl = "https://arief12196.github.io/aplikasi-kasir/";
+// FUNGSI BANTUAN: MENDAPATKAN KODE REFERAL AKTIF (DARI URL ATAU DARI USER YANG LOGIN)
+function getActiveReferralCode() {
   var urlParams = new URLSearchParams(window.location.search);
   var refCode = urlParams.get('ref');
+
+  // Jika tidak ada di URL, cek apakah user yang sedang login memiliki noDana (kode referal miliknya sendiri)
+  if (!refCode) {
+    let loggedUser = JSON.parse(localStorage.getItem('aff_logged_in'));
+    if (loggedUser && loggedUser.noDana) {
+      refCode = loggedUser.noDana;
+    }
+  }
+  return refCode;
+}
+
+// FUNGSI UNTUK MENGARAHKAN KE HALAMAN TRIAL DENGAN MEMBAWA KODE REFERAL AKTIF
+function goToTrial() {
+  var trialBaseUrl = "https://arief12196.github.io/aplikasi-kasir/";
+  var refCode = getActiveReferralCode();
 
   if (refCode) {
     window.location.href = trialBaseUrl + "?ref=" + refCode;
@@ -411,16 +425,7 @@ function goToTrial() {
 // FUNGSI UNTUK MENGARAHKAN KE HALAMAN PEMBAYARAN MENGGUNAKAN LINK TUJUAN & REFERAL AKTIF
 function goToDirectPay() {
   var payBaseUrl = "https://arief12196.github.io/affione/";
-  var urlParams = new URLSearchParams(window.location.search);
-  var refCode = urlParams.get('ref');
-
-  // Jika tidak ada di URL, cek apakah user yang login sedang membuka dashboard dengan referal sendiri
-  if (!refCode) {
-    let loggedUser = JSON.parse(localStorage.getItem('aff_logged_in'));
-    if (loggedUser && loggedUser.noDana) {
-      refCode = loggedUser.noDana;
-    }
-  }
+  var refCode = getActiveReferralCode();
 
   if (refCode) {
     window.location.href = payBaseUrl + "?ref=" + refCode;
@@ -635,6 +640,17 @@ function checkLoginStatus() {
   } else {
     document.getElementById("orderForm").classList.add("form-blur-overlay");
     document.getElementById("lockBanner").style.display = "block";
+  }
+
+  // Jika user datang melalui URL referal, isi juga form input referal secara otomatis
+  if (refCode) {
+    document.getElementById('kodeReferalInput').value = refCode;
+  } else if (loggedUser && loggedUser.noDana) {
+    // Jika user yang login membuka halamannya sendiri, tampilkan noDana mereka di form jika kosong
+    let currentInputVal = document.getElementById('kodeReferalInput').value;
+    if (!currentInputVal) {
+      document.getElementById('kodeReferalInput').value = loggedUser.noDana;
+    }
   }
 
   if(loggedUser) {
