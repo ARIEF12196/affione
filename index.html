@@ -43,7 +43,7 @@
     box-shadow: 0 0 5px rgba(0, 86, 179, 0.3);
   }
 
-  .btn-next, .btn-submit, .btn-custom {
+  .btn-next, .btn-submit, .btn-custom, .btn-trial {
     width: 100%;
     background-color: #0056b3;
     color: white;
@@ -56,9 +56,13 @@
     margin-top: 10px;
     transition: background 0.3s ease;
   }
-  .btn-next:hover, .btn-custom:hover { background-color: #004085; }
+  .btn-next:hover, .btn-custom:hover { background-color: #4085; }
   .btn-submit { background-color: #28a745; }
   .btn-submit:hover { background-color: #218838; }
+  
+  /* Tombol Khusus Trial warna Oranye/Amber */
+  .btn-trial { background-color: #fd7e14; margin-bottom: 10px; }
+  .btn-trial:hover { background-color: #e86902; }
 
   .aff-top-bar {
     display: flex;
@@ -145,7 +149,6 @@
     margin: 10px auto; border-radius: 8px; overflow: hidden;
     border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
-  .qris-frame-container iframe { width: 100%; height: 100%; border: none; }
 
   .timer-box {
     margin-top: 12px; background-color: #fff3cd; border: 1px solid #ffeba2;
@@ -180,6 +183,9 @@
     <p>Harga Promo: Rp 100.000</p>
   </div>
   
+  <!-- TOMBOL TRIAL OTOMATIS MEMBAWA LINK REFERAL -->
+  <button type="button" class="btn-trial" onclick="goToTrial()">🎁 Coba Versi Trial Gratis Dulu</button>
+
   <!-- BAGIAN FORM PEMESANAN -->
   <div class="form-locked-wrapper">
     
@@ -368,13 +374,12 @@
   </div>
 </div>
 
-<!-- MODAL BARU: POP-UP DETAIL DATA UNTUK JENDELA BESAR -->
+<!-- MODAL DETAIL DATA -->
 <div id="detailModal" class="modal-overlay">
   <div class="modal-content" style="max-width: 500px; text-align: left;">
     <span class="close-btn" onclick="closeDetailModal()">&times;</span>
     <h3 style="color: #0056b3; margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 8px;">🔍 Detail Data Terpilih</h3>
     <div id="detailModalBody" style="font-size: 14px; line-height: 1.6; color: #333; margin: 15px 0;">
-      <!-- Isi rincian data akan masuk otomatis di sini -->
     </div>
     <button type="button" class="btn-custom" onclick="closeDetailModal()">Tutup</button>
   </div>
@@ -382,6 +387,21 @@
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0hiNjoFxbaCwRMANwILVSMdtl84chsAF1OSFxA_3CgM2ZgdXtJrSmxqed7bHfBs4b2A/exec";
+
+// FUNGSI UNTUK MENGARAHKAN KE HALAMAN TRIAL DENGAN MEMBAWA KODE REFERAL (JIKA ADA)
+function goToTrial() {
+  var trialBaseUrl = "https://arief12196.github.io/aplikasi-kasir/";
+  var urlParams = new URLSearchParams(window.location.search);
+  var refCode = urlParams.get('ref');
+
+  if (refCode) {
+    // Jika pengunjung datang dari link afiliasi, teruskan parameter ?ref=... ke halaman trial
+    window.location.href = trialBaseUrl + "?ref=" + refCode;
+  } else {
+    // Jika tidak ada referal, langsung buka link trial biasa
+    window.location.href = trialBaseUrl;
+  }
+}
 
 function generateInvoice() {
   var date = new Date();
@@ -703,7 +723,6 @@ function lockAdmin() {
   closeAdminModal();
 }
 
-// FUNGSI UNTUK MEMBUKA POP-UP JENDELA BESAR KETIKA DIKLIK
 function showAffiliateDetail(nama, email, noHp, noDana, pass, komisi, totalOrders, invoices, tanggal) {
   let html = `
     <p><b>Nama:</b> ${nama}</p>
@@ -753,7 +772,6 @@ function loadAdminServerData() {
         htmlUsers = "<table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse; border-color:#ddd;'>";
         htmlUsers += "<tr style='background:#eef5ff;'><th>Nama</th><th>No DANA</th><th>Komisi</th><th>Aksi</th></tr>";
         users.forEach(u => {
-          // Escape parameter string untuk menghindari error tanda kutip
           let uNama = (u.nama || '').replace(/'/g, "\\'");
           let uEmail = (u.email || '').replace(/'/g, "\\'");
           let uInvoices = (u.invoices || '').replace(/'/g, "\\'");
